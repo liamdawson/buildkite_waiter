@@ -1,0 +1,5 @@
+[workspace]
+members = [
+  "buildkite_rust",
+  "buildkite_waiter"
+]

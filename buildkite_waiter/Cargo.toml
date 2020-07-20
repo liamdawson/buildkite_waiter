@@ -1,0 +1,28 @@
+[package]
+name = "buildkite_waiter"
+version = "0.0.1-alpha.3"
+authors = ["Liam Dawson <liam@ldaws.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+# I don't think this can be published if buildkite_rust isn't
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+buildkite_rust = { path = "../buildkite_rust" }
+keyring = "0.9.0"
+dialoguer = "0.6.2"
+tokio = { version = "0.2", features = ["full"] }
+anyhow = "1.0.31"
+console = "0.11.3"
+url = "2.1.1"
+structopt = "0.3.15"
+chrono = "0.4.13"
+notify-rust = "4"
+clap = "2.33.1"
+serde = { version = "1.0.114", features = ["derive"] }
+serde_json = "1.0.56"
+chrono-humanize = "0.0.11"
+log = "0.4.11"
+fern = "0.6.0"
