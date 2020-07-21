@@ -64,9 +64,7 @@ pub async fn build_by_args(client: &Buildkite, args: &cli::WaitArgs) -> anyhow::
             client.builds().all()
         };
 
-        let resp = req.get().await?;
-
-        first_build(resp)
+        first_build(req.per_page(1).get().await?)
     } else {
         bail!("Unable to identify a build from the command line arguments")
     }
