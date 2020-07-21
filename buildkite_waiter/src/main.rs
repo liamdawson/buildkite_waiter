@@ -21,47 +21,27 @@ async fn main() -> anyhow::Result<()> {
     configure_logger()?;
 
     let exit_code = match Command::from_args() {
-        Command::Wait(args) => {
-            let should_notify = args.notification;
-            let error_exit_strategy = args.error_on;
-            let output_notification_json = args.output_notification_json;
+        Command::ByNumber => {
+            todo!();
+        },
+        Command::ByUrl => {
+            todo!();
+        },
+        Command::Latest => {
+            todo!();
+        },
+        Command::Wait { raw_parameters } => {
+            println!("Wait has been replaced by more specific subcommands.");
 
-            match wait::wait(api_auth::client()?, &args).await {
-                Ok((state, notification_content)) => {
-                    let notification: notify_rust::Notification = (&notification_content).into();
-
-                    if should_notify {
-                        if let Err(e) = notification.show() {
-                            log::warn!("Unable to display notification: {}", e);
-                        }
-                    }
-
-                    if output_notification_json {
-                        println!("{}", serde_json::to_string(&notification_content)?);
-                    }
-
-                    match error_exit_strategy {
-                        cli::ExitStatusStrategy::BuildFailedOrCanceled => {
-                            match state {
-                                BuildState::Failed | BuildState::Canceled => Ok(2),
-                                _ => Ok(0),
-                            }
-                        },
-                        _ => Ok(0)
-                    }
-                },
-                Err(e) => {
-                    if should_notify {
-                        notify_rust::Notification::new()
-                            .summary("Wait failed")
-                            .body(&format!("{}", e))
-                            .show()
-                            .ok(); // don't check if the notification could be sent
-                    }
-
-                    Err(e)
-                },
+            if raw_parameters.iter().any(|p| p == "--url") {
+                println!("You may want to try by-url instead.");
+            } else if raw_parameters.iter().any(|p| p == "--number") {
+                println!("You may want to try by-number instead.");
+            } else {
+                println!("Try `buildkite_waiter help` to see available commands.");
             }
+
+            Ok(1)
         },
         Command::Login => login::login(),
         Command::Logout => logout::logout(),
