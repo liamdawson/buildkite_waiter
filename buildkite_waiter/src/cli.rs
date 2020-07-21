@@ -30,6 +30,10 @@ pub struct WaitArgs {
     /// Specify the build number within the pipeline
     pub number: Option<u32>,
 
+    #[structopt(long, group = "build")]
+    /// Find the latest build matching the other filters
+    pub latest: bool,
+
     #[structopt(long)]
     /// Display a system notification when the app finishes waiting for a build
     pub notification: bool,

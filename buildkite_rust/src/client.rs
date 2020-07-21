@@ -44,6 +44,12 @@ impl Buildkite {
         self
     }
 
+    pub(crate) fn request_by_url(self, method: reqwest::Method, url: Url) -> reqwest::RequestBuilder {
+        self.client
+            .request(method, url)
+            .bearer_auth(self.api_token.expose_secret())
+    }
+
     pub(crate) fn request<I>(self, method: reqwest::Method, path_segments: I) -> reqwest::RequestBuilder where I: IntoIterator, I::Item: AsRef<str> {
         let mut url = self.api_url.clone();
 
@@ -51,7 +57,6 @@ impl Buildkite {
             .expect("path_segments_mut failed on Buildkite.api_url")
             .extend(path_segments);
 
-        self.client.request(method, url)
-            .bearer_auth(self.api_token.expose_secret())
+        self.request_by_url(method, url)
     }
 }

@@ -1,6 +1,7 @@
 use serde::de::DeserializeOwned;
 use once_cell::sync::OnceCell;
 
+#[derive(Debug)]
 pub struct ApiResponse<TExpected: DeserializeOwned> {
     // TODO: reduce implementation exposure?
     pub headers: reqwest::header::HeaderMap,

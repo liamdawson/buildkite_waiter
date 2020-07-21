@@ -2,15 +2,13 @@ use anyhow::Context;
 use crate::cli;
 use buildkite_rust::BuildState;
 use output::NotificationContent;
+use url::Url;
 
 mod find;
 mod output;
 
 pub async fn wait(client: buildkite_rust::Buildkite, args: &cli::WaitArgs) -> anyhow::Result<(BuildState, NotificationContent)> {
-    let (organization, build_response) = find::build_by_args(&client, &args).await.context("Unable to find referenced build")?;
-
-    let mut build_response = build_response.error_for_status().context("Server response was not successful")?;
-    let mut build = build_response.body().context("Unable to deserialize response body")?;
+    let mut build = find::build_by_args(&client, &args).await.context("Unable to find referenced build")?;
 
     output::print_build_info(&build);
 
@@ -21,17 +19,20 @@ pub async fn wait(client: buildkite_rust::Buildkite, args: &cli::WaitArgs) -> an
 
         info!("Checking build status");
 
+        let build_url = Url::parse(&build.url)?;
+
         let get_result = tokio::select! {
             _ = &mut timeout => {
                 anyhow::bail!("Timed out waiting for build.");
             },
-            get_result = client.build().get(&organization, &build.pipeline.slug, &build.number) => get_result,
+            get_result = client.build().by_url(build_url) => get_result,
         };
 
-        build_response = get_result.context("Unable to retrieve build details")?
-            .error_for_status().context("Server response was not successful")?;
-        build = build_response.body().context("Unable to deserialize response body")?;
+        build = get_result.context("Unable to retrieve build details")?
+            .error_for_status().context("Server response was not successful")?
+            .body().context("Unable to deserialize response body")?
+            .clone();
     }
 
-    Ok((build.state, build.into()))
+    Ok((build.state, (&build).into()))
 }
