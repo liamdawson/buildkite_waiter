@@ -4,7 +4,11 @@ const TEST_TOKEN: &str = "test_token";
 const EXPECTED_AUTH_HEADER: &str = "Bearer test_token";
 
 pub fn json_snapshot_mock(method: &str, path: &str, name: &str, status: usize) -> mockito::Mock {
-    let fixture_path = format!("{}/examples/fixtures/{}.json", env!("CARGO_MANIFEST_DIR"), name);
+    let fixture_path = format!(
+        "{}/examples/fixtures/{}.json",
+        env!("CARGO_MANIFEST_DIR"),
+        name
+    );
 
     mockito::mock(method, path)
         .match_header("Authorization", EXPECTED_AUTH_HEADER)
@@ -13,13 +17,11 @@ pub fn json_snapshot_mock(method: &str, path: &str, name: &str, status: usize) -
 }
 
 fn mockito_url() -> reqwest::Url {
-    reqwest::Url::parse(&mockito::server_url())
-        .expect("Failed to parse mockito server_url")
+    reqwest::Url::parse(&mockito::server_url()).expect("Failed to parse mockito server_url")
 }
 
 pub fn subject() -> buildkite_rust::Buildkite {
-    buildkite_rust::Buildkite::authenticated(TEST_TOKEN)
-        .api_url(mockito_url())
+    buildkite_rust::Buildkite::authenticated(TEST_TOKEN).api_url(mockito_url())
 }
 
 #[macro_export]
@@ -28,11 +30,20 @@ pub fn subject() -> buildkite_rust::Buildkite {
 macro_rules! expect_response_and_body {
     ($subject:expr) => {{
         let response = $subject
-            .await.expect(&format!("Request triggered by {} failed", stringify!($subject)))
-            .error_for_status().expect(&format!("Request triggered by {} returned non-success", stringify!($subject)));
+            .await
+            .expect(&format!(
+                "Request triggered by {} failed",
+                stringify!($subject)
+            ))
+            .error_for_status()
+            .expect(&format!(
+                "Request triggered by {} returned non-success",
+                stringify!($subject)
+            ));
 
         let body = response
-            .body().expect(&format!("Request body parse for {}", stringify!($subject)))
+            .body()
+            .expect(&format!("Request body parse for {}", stringify!($subject)))
             .clone();
 
         (response, body)

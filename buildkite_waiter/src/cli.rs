@@ -1,6 +1,6 @@
-use url::Url;
-use structopt::StructOpt;
 use structopt::clap::AppSettings;
+use structopt::StructOpt;
+use url::Url;
 
 fn allowed_build_states() -> &'static [&'static str] {
     &[
@@ -50,10 +50,12 @@ pub enum Command {
         #[structopt(flatten)]
         strategy: LatestStrategyArgs,
     },
-    #[structopt(setting(AppSettings::Hidden), setting(AppSettings::TrailingVarArg), setting(AppSettings::AllowLeadingHyphen))]
-    Wait {
-        raw_parameters: Vec<String>
-    },
+    #[structopt(
+        setting(AppSettings::Hidden),
+        setting(AppSettings::TrailingVarArg),
+        setting(AppSettings::AllowLeadingHyphen)
+    )]
+    Wait { raw_parameters: Vec<String> },
 }
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]
@@ -83,7 +85,7 @@ pub struct LatestStrategyArgs {
     /// Find build by (long) commit hash
     pub commit: Option<String>,
     #[structopt(long, possible_values = allowed_build_states())]
-    pub state: Vec<String>
+    pub state: Vec<String>,
 }
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]

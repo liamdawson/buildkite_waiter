@@ -1,5 +1,5 @@
-use serde::de::DeserializeOwned;
 use once_cell::sync::OnceCell;
+use serde::de::DeserializeOwned;
 
 #[derive(Debug)]
 pub struct ApiResponse<TExpected: DeserializeOwned> {
@@ -41,6 +41,7 @@ impl<TExpected: DeserializeOwned> ApiResponse<TExpected> {
     }
 
     pub fn body(&self) -> Result<&TExpected, serde_json::Error> {
-        self.body.get_or_try_init(|| serde_json::from_slice(&self.raw_body))
+        self.body
+            .get_or_try_init(|| serde_json::from_slice(&self.raw_body))
     }
 }

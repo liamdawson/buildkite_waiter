@@ -5,5 +5,5 @@ mod response;
 pub mod api;
 
 pub use client::*;
-pub use response::*;
 pub use models::*;
+pub use response::*;

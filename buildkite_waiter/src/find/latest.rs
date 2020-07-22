@@ -1,5 +1,5 @@
-use buildkite_rust::{Build, Buildkite};
 use anyhow::{bail, Context};
+use buildkite_rust::{Build, Buildkite};
 
 impl crate::cli::LatestStrategyArgs {
     pub async fn find_build(&self, client: &Buildkite) -> anyhow::Result<Build> {
@@ -33,13 +33,14 @@ impl crate::cli::LatestStrategyArgs {
             req = req.commit(commit);
         }
 
-        let response = req.get()
-            .await.context("Request could not complete")?;
+        let response = req.get().await.context("Request could not complete")?;
 
-        let success_response = response.error_for_status()
+        let success_response = response
+            .error_for_status()
             .context("Request was unsuccessful")?;
 
-        let builds = success_response.body()
+        let builds = success_response
+            .body()
             .context("Unexpected response body")?;
 
         match builds.first() {

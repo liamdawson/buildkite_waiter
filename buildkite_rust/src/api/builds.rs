@@ -35,12 +35,25 @@ impl BuildsApi {
         ListRequestBuilder::scoped(self.buildkite, ListScope::All)
     }
 
-    pub fn organization<O>(self, organization: O) -> ListRequestBuilder where O: Display {
-        ListRequestBuilder::scoped(self.buildkite, ListScope::Organization(format!("{}", organization)))
+    pub fn organization<O>(self, organization: O) -> ListRequestBuilder
+    where
+        O: Display,
+    {
+        ListRequestBuilder::scoped(
+            self.buildkite,
+            ListScope::Organization(format!("{}", organization)),
+        )
     }
 
-    pub fn pipeline<O, P>(self, organization: O, pipeline: P) -> ListRequestBuilder where O: Display, P: Display {
-        ListRequestBuilder::scoped(self.buildkite,  ListScope::Pipeline(format!("{}", organization), format!("{}", pipeline)))
+    pub fn pipeline<O, P>(self, organization: O, pipeline: P) -> ListRequestBuilder
+    where
+        O: Display,
+        P: Display,
+    {
+        ListRequestBuilder::scoped(
+            self.buildkite,
+            ListScope::Pipeline(format!("{}", organization), format!("{}", pipeline)),
+        )
     }
 }
 
@@ -60,24 +73,35 @@ impl ListRequestBuilder {
     pub async fn get(self) -> Result<ApiResponse<Vec<Build>>, reqwest::Error> {
         let mut req = match self.scope {
             ListScope::All => self.buildkite.request(Method::GET, &["builds"]),
-            ListScope::Organization(org) => self.buildkite.request(Method::GET, &["organizations", &org, "builds"]),
-            ListScope::Pipeline(org, pipeline) => self.buildkite.request(Method::GET, &["organizations", &org, "pipelines", &pipeline, "builds"]),
+            ListScope::Organization(org) => self
+                .buildkite
+                .request(Method::GET, &["organizations", &org, "builds"]),
+            ListScope::Pipeline(org, pipeline) => self.buildkite.request(
+                Method::GET,
+                &["organizations", &org, "pipelines", &pipeline, "builds"],
+            ),
         };
 
         req = req.query(&[("per_page", format!("{}", self.per_page))]);
 
         if !self.branches.is_empty() {
-            req = req.query(self.branches.into_iter()
-                .map(|branch| ("branch[]", branch))
-                .collect::<Vec<_>>()
-                .as_slice());
+            req = req.query(
+                self.branches
+                    .into_iter()
+                    .map(|branch| ("branch[]", branch))
+                    .collect::<Vec<_>>()
+                    .as_slice(),
+            );
         }
 
         if !self.states.is_empty() {
-            req = req.query(self.states.into_iter()
-                .map(|state| ("state[]", state))
-                .collect::<Vec<_>>()
-                .as_slice());
+            req = req.query(
+                self.states
+                    .into_iter()
+                    .map(|state| ("state[]", state))
+                    .collect::<Vec<_>>()
+                    .as_slice(),
+            );
         }
 
         if let Some(creator) = self.creator {
@@ -105,7 +129,11 @@ impl ListRequestBuilder {
         self
     }
 
-    pub fn branches<B>(mut self, branches: B) -> Self where B: IntoIterator, B::Item: AsRef<str> {
+    pub fn branches<B>(mut self, branches: B) -> Self
+    where
+        B: IntoIterator,
+        B::Item: AsRef<str>,
+    {
         for branch in branches {
             self.branches.push(branch.as_ref().to_string());
         }
@@ -132,7 +160,11 @@ impl ListRequestBuilder {
         self
     }
 
-    pub fn states<I>(mut self, states: I) -> Self where I: IntoIterator, I::Item: AsRef<str> {
+    pub fn states<I>(mut self, states: I) -> Self
+    where
+        I: IntoIterator,
+        I::Item: AsRef<str>,
+    {
         for state in states {
             self.states.push(state.as_ref().to_string());
         }

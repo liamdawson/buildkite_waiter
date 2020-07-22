@@ -1,7 +1,8 @@
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
-use structopt::StructOpt;
 use cli::Command;
+use structopt::StructOpt;
 
 mod api_auth;
 mod cli;
@@ -27,22 +28,43 @@ async fn main() -> anyhow::Result<()> {
             println!("Try `buildkite_waiter help` to see available commands.");
 
             Ok(1)
-        },
-        Command::ByNumber { output, runtime, strategy } => {
-            wait::for_build(|client| async move {
-                strategy.find_build(&client).await
-            }, runtime, output).await
-        },
-        Command::ByUrl { output, runtime, strategy } => {
-            wait::for_build(|client| async move {
-                strategy.find_build(&client).await
-            }, runtime, output).await
-        },
-        Command::Latest { output, runtime, strategy } => {
-            wait::for_build(|client| async move {
-                strategy.find_build(&client).await
-            }, runtime, output).await
-        },
+        }
+        Command::ByNumber {
+            output,
+            runtime,
+            strategy,
+        } => {
+            wait::for_build(
+                |client| async move { strategy.find_build(&client).await },
+                runtime,
+                output,
+            )
+            .await
+        }
+        Command::ByUrl {
+            output,
+            runtime,
+            strategy,
+        } => {
+            wait::for_build(
+                |client| async move { strategy.find_build(&client).await },
+                runtime,
+                output,
+            )
+            .await
+        }
+        Command::Latest {
+            output,
+            runtime,
+            strategy,
+        } => {
+            wait::for_build(
+                |client| async move { strategy.find_build(&client).await },
+                runtime,
+                output,
+            )
+            .await
+        }
         Command::Login => login::login(),
         Command::Logout => logout::logout(),
     }?;

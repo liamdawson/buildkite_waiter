@@ -1,8 +1,8 @@
 use super::job::*;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
-use chrono::{Utc, DateTime};
 use strum_macros::*;
 
 pub type BuildNumber = u32;

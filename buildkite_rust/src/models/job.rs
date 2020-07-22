@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use chrono::{Utc, DateTime};
+use std::collections::HashMap;
 
 type NullableDateTime = Option<DateTime<Utc>>;
 type TriggerBuildJob = Value;
