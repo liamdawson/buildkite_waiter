@@ -45,9 +45,11 @@ impl Into<Notification> for &NotificationContent {
 impl NotificationContent {
     pub fn show_notification(
         &self,
-    ) -> Result<notify_rust::NotificationHandle, notify_rust::error::Error> {
+    ) -> Result<(), notify_rust::error::Error> {
         let notification: Notification = self.into();
 
-        notification.show()
+        notification.show()?;
+
+        Ok(())
     }
 }
