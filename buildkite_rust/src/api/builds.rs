@@ -13,9 +13,13 @@ enum ListScope {
 }
 
 pub struct ListRequestBuilder {
-    pub per_page: u16,
     buildkite: crate::Buildkite,
     scope: ListScope,
+    per_page: u16,
+    branches: Vec<String>,
+    creator: Option<String>,
+    commit: Option<String>,
+    states: Vec<String>,
 }
 
 impl crate::Buildkite {
@@ -43,9 +47,13 @@ impl BuildsApi {
 impl ListRequestBuilder {
     fn scoped(buildkite: crate::Buildkite, scope: ListScope) -> Self {
         ListRequestBuilder {
-            per_page: 30,
             buildkite,
             scope,
+            branches: Vec::default(),
+            commit: None,
+            creator: None,
+            per_page: 30,
+            states: Vec::default(),
         }
     }
 
@@ -58,6 +66,28 @@ impl ListRequestBuilder {
 
         req = req.query(&[("per_page", format!("{}", self.per_page))]);
 
+        if !self.branches.is_empty() {
+            req = req.query(self.branches.into_iter()
+                .map(|branch| ("branch[]", branch))
+                .collect::<Vec<_>>()
+                .as_slice());
+        }
+
+        if !self.states.is_empty() {
+            req = req.query(self.states.into_iter()
+                .map(|state| ("state[]", state))
+                .collect::<Vec<_>>()
+                .as_slice());
+        }
+
+        if let Some(creator) = self.creator {
+            req = req.query(&[("creator", &creator)]);
+        }
+
+        if let Some(commit) = self.commit {
+            req = req.query(&[("commit", &commit)]);
+        }
+
         let resp = req.send().await?;
 
         Ok(ApiResponse::from_reqwest(resp).await?)
@@ -65,6 +95,47 @@ impl ListRequestBuilder {
 
     pub fn per_page(mut self, per_page: u16) -> Self {
         self.per_page = per_page;
+
+        self
+    }
+
+    pub fn branch<B: AsRef<str>>(mut self, branch: B) -> Self {
+        self.branches.push(branch.as_ref().to_string());
+
+        self
+    }
+
+    pub fn branches<B>(mut self, branches: B) -> Self where B: IntoIterator, B::Item: AsRef<str> {
+        for branch in branches {
+            self.branches.push(branch.as_ref().to_string());
+        }
+
+        self
+    }
+
+    pub fn creator<C: AsRef<str>>(mut self, creator: C) -> Self {
+        self.creator = Some(creator.as_ref().to_string());
+
+        self
+    }
+
+    pub fn commit<C: AsRef<str>>(mut self, commit: C) -> Self {
+        self.commit = Some(commit.as_ref().to_string());
+
+        self
+    }
+
+    // TODO: type strictness on states?
+    pub fn state<S: AsRef<str>>(mut self, state: S) -> Self {
+        self.states.push(state.as_ref().to_string());
+
+        self
+    }
+
+    pub fn states<I>(mut self, states: I) -> Self where I: IntoIterator, I::Item: AsRef<str> {
+        for state in states {
+            self.states.push(state.as_ref().to_string());
+        }
 
         self
     }

@@ -1,6 +1,5 @@
 use crate::{ApiResponse, Build};
 use reqwest::{Url, Method};
-use std::fmt::Display;
 
 pub struct BuildApi {
     buildkite: crate::Buildkite,
@@ -15,9 +14,9 @@ impl crate::Buildkite {
 }
 
 impl BuildApi {
-    pub async fn get<O, P, N>(self, organization: O, pipeline: P, number: N) -> Result<ApiResponse<Build>, reqwest::Error> where O: Display, P: Display, N: Display {
+    pub async fn get<O, P>(self, organization: O, pipeline: P, number: u32) -> Result<ApiResponse<Build>, reqwest::Error> where O: AsRef<str>, P: AsRef<str> {
         let resp = self.buildkite
-            .request(Method::GET, &["organizations", &format!("{}", organization), "pipelines", &format!("{}", pipeline), "builds", &format!("{}", number)])
+            .request(Method::GET, &["organizations", &format!("{}", organization.as_ref()), "pipelines", &format!("{}", pipeline.as_ref()), "builds", &format!("{}", number)])
             .send().await?;
 
         Ok(ApiResponse::from_reqwest(resp).await?)

@@ -2,15 +2,16 @@
 
 use structopt::StructOpt;
 use cli::Command;
-use buildkite_rust::BuildState;
 
 mod api_auth;
 mod cli;
+mod find;
+mod output;
+mod wait;
 
 // commands
 mod login;
 mod logout;
-mod wait;
 
 pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
 pub const DEVELOPER_IDENTIFIER: &str = "com.ldaws";
@@ -21,27 +22,26 @@ async fn main() -> anyhow::Result<()> {
     configure_logger()?;
 
     let exit_code = match Command::from_args() {
-        Command::ByNumber => {
-            todo!();
-        },
-        Command::ByUrl => {
-            todo!();
-        },
-        Command::Latest => {
-            todo!();
-        },
-        Command::Wait { raw_parameters } => {
-            println!("Wait has been replaced by more specific subcommands.");
-
-            if raw_parameters.iter().any(|p| p == "--url") {
-                println!("You may want to try by-url instead.");
-            } else if raw_parameters.iter().any(|p| p == "--number") {
-                println!("You may want to try by-number instead.");
-            } else {
-                println!("Try `buildkite_waiter help` to see available commands.");
-            }
+        Command::Wait { raw_parameters: _ } => {
+            println!("Wait has been replaced with by-url and by-number.");
+            println!("Try `buildkite_waiter help` to see available commands.");
 
             Ok(1)
+        },
+        Command::ByNumber { output, runtime, strategy } => {
+            wait::for_build(|client| async move {
+                strategy.find_build(&client).await
+            }, runtime, output).await
+        },
+        Command::ByUrl { output, runtime, strategy } => {
+            wait::for_build(|client| async move {
+                strategy.find_build(&client).await
+            }, runtime, output).await
+        },
+        Command::Latest { output, runtime, strategy } => {
+            wait::for_build(|client| async move {
+                strategy.find_build(&client).await
+            }, runtime, output).await
         },
         Command::Login => login::login(),
         Command::Logout => logout::logout(),
