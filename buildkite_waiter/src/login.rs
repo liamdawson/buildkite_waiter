@@ -13,6 +13,7 @@ pub fn login() -> anyhow::Result<i32> {
 
     api_auth::keyring_entry()
         .set_password(&access_token)
+        .map_err(api_auth::serialize_error)
         .context("Failed to save API token")?;
 
     println!("{}", console::style("OK").green());
