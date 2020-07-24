@@ -93,12 +93,11 @@ jobs:
       shell: bash
       run: |
         staging="buildkite_waiter-${{ env.RELEASE_VERSION }}-${{ matrix.target }}"
-        mkdir -p "$staging"/{doc,complete}
+        mkdir -p "$staging"/complete
         outdir="$(find target/release -name buildkite_waiter-stamp -print0 \
           | xargs -0 ls -t | head -n1 | xargs dirname)"
 
-        cp {README.md,COPYING,LICENSE-MIT,LICENSE-APACHE} "$staging/"
-        cp CHANGELOG.md "$staging/doc/"
+        cp {README.md,COPYING,LICENSE-MIT,LICENSE-APACHE,CHANGELOG.md} "$staging/"
         cp "$outdir"/{buildkite_waiter.bash,buildkite_waiter.fish,_buildkite_waiter,_buildkite_waiter.ps1} "$staging/complete/"
 
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
