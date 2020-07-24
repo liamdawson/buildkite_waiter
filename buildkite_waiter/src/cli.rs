@@ -78,6 +78,9 @@ pub struct LatestStrategyArgs {
     pub pipeline: Option<String>,
     #[structopt(long)]
     pub branch: Vec<String>,
+    #[structopt(long)]
+    /// Find build by owner of the API Access Token (requires the "Read User" permission on the token)
+    pub mine: bool,
     #[structopt(long, conflicts_with("mine"))]
     /// Find build by creator ID
     pub creator: Option<String>,

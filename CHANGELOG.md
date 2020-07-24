@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `latest` to wait for the latest build matching the options
 
   - Includes support for `--branch`, `--state`, `--creator` and `--commit` options
+  - Supports `--mine` to filter by builds created by the API Access Token owner
 
 ## [0.0.1-alpha.3] - 2020-07-21
 

@@ -1,6 +1,10 @@
 use anyhow::{bail, Context};
 use buildkite_rust::{Build, Buildkite};
 
+async fn get_current_user_id(client: &Buildkite) -> anyhow::Result<String> {
+    Ok(client.user().get_access_token_holder().await?.error_for_status()?.body()?.id.clone())
+}
+
 impl crate::cli::LatestStrategyArgs {
     pub async fn find_build(&self, client: &Buildkite) -> anyhow::Result<Build> {
         let mut req = if let Some(pipeline) = &self.pipeline {
@@ -27,6 +31,12 @@ impl crate::cli::LatestStrategyArgs {
 
         if let Some(creator) = &self.creator {
             req = req.creator(creator);
+        } else if self.mine {
+            let user_id = get_current_user_id(&client).await.context("Unable to determine the current user (the API Access Token may need the \"Read User\" permission)")?;
+
+            debug!("Current user's ID: {}", &user_id);
+
+            req = req.creator(&user_id);
         }
 
         if let Some(commit) = &self.commit {
