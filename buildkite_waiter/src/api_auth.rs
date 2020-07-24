@@ -3,7 +3,7 @@ use buildkite_rust::Buildkite;
 use keyring::Keyring;
 
 pub fn keyring_entry() -> Keyring<'static> {
-    Keyring::new(crate::APP_ID, "https://api.buildkite.com/v2/aaaaaaaaaa")
+    Keyring::new(crate::APP_ID, "https://api.buildkite.com/v2/")
 }
 
 // Currently, keyring uses dbus 0.2.3, which doesn't impl Sync on the error type
