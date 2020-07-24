@@ -2,7 +2,14 @@ use anyhow::{bail, Context};
 use buildkite_rust::{Build, Buildkite};
 
 async fn get_current_user_id(client: &Buildkite) -> anyhow::Result<String> {
-    Ok(client.user().get_access_token_holder().await?.error_for_status()?.body()?.id.clone())
+    Ok(client
+        .user()
+        .get_access_token_holder()
+        .await?
+        .error_for_status()?
+        .body()?
+        .id
+        .clone())
 }
 
 impl crate::cli::LatestStrategyArgs {
