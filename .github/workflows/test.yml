@@ -10,14 +10,11 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-
+  build-ubuntu:
+    runs-on: ubuntu-latest
     steps:
+    - name: Install Ubuntu dependencies
+      run: sudo apt-get install -y libdbus-1-dev
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose
