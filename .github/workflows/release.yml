@@ -63,12 +63,15 @@ jobs:
     - name: Install Ubuntu dependencies
       if: matrix.build == 'linux'
       run: sudo apt-get install -y libdbus-1-dev
+
     - uses: actions/checkout@v2
+
     - name: Get release download URL
       uses: actions/download-artifact@v1
       with:
         name: artifacts
         path: artifacts
+
     - name: Set release upload URL and release version
       shell: bash
       run: |
@@ -80,11 +83,12 @@ jobs:
         echo "release version: $RELEASE_VERSION"
 
     - name: Build release binary
-      run: cargo build --release --verbose
+      # TODO: --release
+      run: cargo build --verbose
 
     - name: Strip release binary (linux and macos)
       if: matrix.build == 'linux' || matrix.build == 'macos'
-      run: strip "target/${{ matrix.target }}/release/buildkite_waiter"
+      run: strip "target/release/buildkite_waiter"
 
     - name: Build release archive
       shell: bash
@@ -93,11 +97,11 @@ jobs:
         mkdir -p "$staging"/{complete,doc}
 
         if [ "${{ matrix.build }}" = "windows" ]; then
-          cp "target/${{ matrix.target }}/release/buildkite_waiter.exe" "$staging/"
+          cp "target/release/buildkite_waiter.exe" "$staging/"
           7z a "$staging.zip" "$staging"
           echo "::set-env name=ASSET::$staging.zip"
         else
-          cp "target/${{ matrix.target }}/release/rg" "$staging/"
+          cp "target/release/buildkite_waiter" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
           echo "::set-env name=ASSET::$staging.tar.gz"
         fi
