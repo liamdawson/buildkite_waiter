@@ -27,7 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.APP_VERSION }}
+          tag_name: v${{ env.APP_VERSION }}
           release_name: ${{ env.APP_VERSION }}
 
       - name: Save release upload URL to artifact
