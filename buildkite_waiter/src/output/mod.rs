@@ -43,6 +43,10 @@ impl crate::cli::OutputArgs {
 
         match self.output.as_str() {
             "none" => {}
+            "state-url" => {
+                writeln!(std::io::stderr()).ok();
+                println!("{} {}", style_state(build.state), build.web_url);
+            },
             "notification-json" => match serde_json::to_string(&notification_content) {
                 Ok(json) => println!("{}", json),
                 Err(e) => warn!("Unable to serialize JSON output: {}", e),
@@ -64,4 +68,17 @@ impl crate::cli::OutputArgs {
             _ => 2,
         }
     }
+}
+
+fn style_state(state: BuildState) -> String {
+    let state_str = format!("{:?}", state);
+
+    let colored = match state {
+        BuildState::Passed => style(state_str).green(),
+        BuildState::Blocked => style(state_str).yellow(),
+        BuildState::Failed | BuildState::Canceled => style(state_str).red(),
+        _ => style(state_str).magenta(),
+    };
+
+    format!("{}", colored.bold())
 }
