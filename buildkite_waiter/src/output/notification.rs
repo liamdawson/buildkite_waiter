@@ -1,5 +1,4 @@
 use buildkite_rust::Build;
-use notify_rust::Notification;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -33,21 +32,8 @@ impl From<&Build> for NotificationContent {
     }
 }
 
-impl Into<Notification> for &NotificationContent {
-    fn into(self) -> Notification {
-        notify_rust::Notification::new()
-            .summary(&self.title)
-            .body(&self.message)
-            .finalize()
-    }
-}
-
 impl NotificationContent {
-    pub fn show_notification(&self) -> Result<(), notify_rust::error::Error> {
-        let notification: Notification = self.into();
-
-        notification.show()?;
-
-        Ok(())
+    pub fn show_notification(&self) -> Result<(), Box<dyn std::error::Error>> {
+        notifica::notify(&self.title, &self.message)
     }
 }
