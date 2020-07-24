@@ -45,7 +45,7 @@ jobs:
   build-release:
     needs: ['create-release']
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         build: [linux, macos, win-msvc]
         include:
@@ -88,20 +88,22 @@ jobs:
 
     - name: Strip release binary (linux and macos)
       if: matrix.build == 'linux' || matrix.build == 'macos'
-      run: strip "target/release/buildkite_waiter"
+      # TODO: release
+      run: strip "target/debug/buildkite_waiter"
 
     - name: Build release archive
       shell: bash
+      # TODO: release
       run: |
         staging="buildkite_waiter-${{ env.RELEASE_VERSION }}-${{ matrix.target }}"
         mkdir -p "$staging"/{complete,doc}
 
         if [ "${{ matrix.build }}" = "windows" ]; then
-          cp "target/release/buildkite_waiter.exe" "$staging/"
+          cp "target/debug/buildkite_waiter.exe" "$staging/"
           7z a "$staging.zip" "$staging"
           echo "::set-env name=ASSET::$staging.zip"
         else
-          cp "target/release/buildkite_waiter" "$staging/"
+          cp "target/debug/buildkite_waiter" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
           echo "::set-env name=ASSET::$staging.tar.gz"
         fi
