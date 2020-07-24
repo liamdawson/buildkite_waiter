@@ -107,6 +107,6 @@ pub struct OutputArgs {
     #[structopt(long)]
     /// Send a system notification on completion
     pub notification: bool,
-    #[structopt(long, possible_values = &["notification-json", "notification-lines", "state-url", "none"], default_value = "state-url")]
+    #[structopt(long, possible_values = &["notification-lines", "state-url", "none"], default_value = "state-url")]
     pub output: String,
 }

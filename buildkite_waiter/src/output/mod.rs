@@ -51,10 +51,6 @@ impl crate::cli::OutputArgs {
                 println!("{}", notification_content.title);
                 println!("{}", notification_content.message);
             },
-            "notification-json" => match serde_json::to_string(&notification_content) {
-                Ok(json) => println!("{}", json),
-                Err(e) => warn!("Unable to serialize JSON output: {}", e),
-            },
             _ => {
                 // should only occur if a new possible_value is added to cli.rs
                 unreachable!("Output format has not been defined")
