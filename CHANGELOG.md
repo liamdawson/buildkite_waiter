@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `wait --url` is now `by-url`
 - `wait --organization --pipeline --number` is now `by-number`
-- `--output-notification-json` is now `--output notification-json`
-  - Dropped the `subtitle` value on Macos to match output on other platforms
 
 ### Removed
 
