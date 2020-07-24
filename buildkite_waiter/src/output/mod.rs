@@ -47,6 +47,10 @@ impl crate::cli::OutputArgs {
                 writeln!(std::io::stderr()).ok();
                 println!("{} {}", style_state(build.state), build.web_url);
             },
+            "notification-lines" => {
+                println!("{}", notification_content.title);
+                println!("{}", notification_content.message);
+            },
             "notification-json" => match serde_json::to_string(&notification_content) {
                 Ok(json) => println!("{}", json),
                 Err(e) => warn!("Unable to serialize JSON output: {}", e),
