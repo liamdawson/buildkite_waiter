@@ -3,12 +3,20 @@ use buildkite_rust::Buildkite;
 use keyring::Keyring;
 
 pub fn keyring_entry() -> Keyring<'static> {
-    Keyring::new(crate::APP_ID, "https://api.buildkite.com/v2/")
+    Keyring::new(crate::APP_ID, "https://api.buildkite.com/v2/aaaaaaaaaa")
+}
+
+// Currently, keyring uses dbus 0.2.3, which doesn't impl Sync on the error type
+// This serialization of the error allows context to work, hopefully without
+// losing too much context
+pub fn serialize_error(e: impl std::error::Error) -> anyhow::Error {
+    anyhow::anyhow!("{}", e)
 }
 
 pub fn client() -> anyhow::Result<Buildkite> {
     let access_token = keyring_entry()
         .get_password()
+        .map_err(serialize_error)
         .context("Unable to retrieve a saved API token")?;
 
     Ok(Buildkite::authenticated(access_token))
