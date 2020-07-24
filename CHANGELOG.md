@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2020-07-22
+## [0.1.0] - 2020-07-24
 
 ### Changed
 
@@ -14,12 +14,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--output-notification-json` is now `--output notification-json`
   - Dropped the `subtitle` value on Macos to match output on other platforms
 
+### Removed
+
+- `--output-notification-json`
+
 ### Added
 
 - `latest` to wait for the latest build matching the options
 
   - Includes support for `--branch`, `--state`, `--creator` and `--commit` options
   - Supports `--mine` to filter by builds created by the API Access Token owner
+
+- New `--output` formats:
+
+  - `none`, which outputs nothing to stdout
+  - `state-url` (default), which outputs the build state and web console URL
+  - `notification-lines`, which outputs the title and message of the system notification on separate lines
 
 ## [0.0.1-alpha.3] - 2020-07-21
 
