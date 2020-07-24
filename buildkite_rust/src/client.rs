@@ -4,7 +4,7 @@ use secrecy::{ExposeSecret, SecretString};
 use std::time::Duration;
 
 pub static PUBLIC_BUILDKITE_API_URL: Lazy<Url> = Lazy::new(|| {
-    Url::parse("https://api.buildkite.com/v2/")
+    Url::parse("https://api.buildkite.com/v2")
         .expect("Failed to parse the Buildkite API base URL constant")
 });
 
