@@ -94,7 +94,7 @@ jobs:
       run: |
         staging="buildkite_waiter-${{ env.RELEASE_VERSION }}-${{ matrix.target }}"
         mkdir -p "$staging"/{doc,complete}
-        outdir="$(find "$target_dir" -name buildkite_waiter-stamp -print0 \
+        outdir="$(find target/release -name buildkite_waiter-stamp -print0 \
           | xargs -0 ls -t | head -n1 | xargs dirname)"
 
         cp {README.md,COPYING,LICENSE-MIT,LICENSE-APACHE} "$staging/"
