@@ -33,6 +33,7 @@ impl From<&Build> for NotificationContent {
 }
 
 impl NotificationContent {
+    #[cfg(feature = "os-notifications")]
     pub fn show_notification(&self) -> Result<(), Box<dyn std::error::Error>> {
         notifica::notify(&self.title, &self.message)
     }

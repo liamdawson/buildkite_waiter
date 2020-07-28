@@ -104,6 +104,7 @@ pub struct RuntimeArgs {
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]
 pub struct OutputArgs {
+    #[cfg(feature = "os-notifications")]
     #[structopt(long)]
     /// Send a system notification on completion
     pub notification: bool,

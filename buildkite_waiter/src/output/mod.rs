@@ -57,6 +57,7 @@ impl crate::cli::OutputArgs {
             }
         }
 
+        #[cfg(feature = "os-notifications")]
         if self.notification {
             if let Err(e) = notification_content.show_notification() {
                 warn!("Unable to send system notification: {}", e);
