@@ -57,5 +57,5 @@ where
             .clone();
     }
 
-    Ok(output.on_completion(&build))
+    Ok(output.on_completion(&build).await)
 }

@@ -38,7 +38,7 @@ impl crate::cli::OutputArgs {
         }
     }
 
-    pub fn on_completion(&self, build: &Build) -> i32 {
+    pub async fn on_completion(&self, build: &Build) -> i32 {
         let notification_content: NotificationContent = build.into();
 
         match self.output.as_str() {
@@ -59,7 +59,7 @@ impl crate::cli::OutputArgs {
 
         #[cfg(feature = "os-notifications")]
         if self.notification {
-            if let Err(e) = notification_content.show_notification() {
+            if let Err(e) = notification_content.send_os_notification().await {
                 warn!("Unable to send system notification: {}", e);
             }
         }
