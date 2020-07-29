@@ -14,6 +14,10 @@ where
     F: FnOnce(Buildkite) -> Fut,
     Fut: Future<Output = anyhow::Result<Build>>,
 {
+    if output.notification {
+        warn!("--notification is deprecated: os notifications are now sent by default");
+    }
+
     let client = api_auth::client().context("Unable to prepare a Buildkite client")?;
 
     let mut build = build_fn(client.clone())

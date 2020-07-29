@@ -7,6 +7,10 @@ use console::style;
 use std::io::Write;
 
 impl crate::cli::OutputArgs {
+    pub fn should_notify(&self) -> bool {
+        !self.no_notification
+    }
+
     pub fn found_build(&self, build: &Build) {
         let mut line = format!(
             "{} {}",
@@ -58,7 +62,7 @@ impl crate::cli::OutputArgs {
         }
 
         #[cfg(feature = "os-notifications")]
-        if self.notification {
+        if self.should_notify() {
             if let Err(e) = notification_content.send_os_notification().await {
                 warn!("Unable to send system notification: {}", e);
             }

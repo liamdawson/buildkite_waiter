@@ -104,10 +104,21 @@ pub struct RuntimeArgs {
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]
 pub struct OutputArgs {
+    // deprecated, now default behaviour
+    #[structopt(long, hidden(true))]
+    pub notification: bool,
+
+    // keep for compatibility (but don't show in help output)
+    // if notification support wasn't compiled
+    #[cfg(not(feature = "os-notifications"))]
+    #[structopt(long, hidden(true))]
+    pub no_notification: bool,
+
     #[cfg(feature = "os-notifications")]
     #[structopt(long)]
-    /// Send a system notification on completion
-    pub notification: bool,
+    /// Never send a system notification
+    pub no_notification: bool,
+
     #[structopt(long, possible_values = &["notification-lines", "state-url", "none"], default_value = "state-url")]
     pub output: String,
 }

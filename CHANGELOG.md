@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - OS notification support is now gated behind a default feature, `os-notifications`
+- OS notifications will be shown by default
+
+### Added
+
+- `--no-notification` to prevent OS notifications from being sent
+
+### Fixed
+
+- Improved reliability of OS notifications on Windows
 
 ## [0.1.1] - 2020-07-24
 
