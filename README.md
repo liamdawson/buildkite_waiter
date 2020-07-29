@@ -24,7 +24,7 @@ Buildkite API Access Token:
 OK
 
 # wait for the latest build triggered by the logged in user, receive a notification when done
-$ buildkite_waiter latest --mine --notification
+$ buildkite_waiter latest --mine
 
 # wait for the latest build on the main branch for my-pipeline in my-great-org
 $ buildkite_waiter latest --organization my-great-org --pipeline my-pipeline --branch main
@@ -34,6 +34,9 @@ $ buildkite_waiter by-url https://buildkite.com/my-great-org/my-pipeline/builds/
 
 # wait for a build based on build number
 $ buildkite_waiter by-number my-great-org my-pipeline 1
+
+# wait for latest, but don't send an OS notification
+$ buildkite_waiter latest --no-notification
 ```
 
 ## API Access Token

@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-07-29
+
 ### Changed
 
 - OS notification support is now gated behind a default feature, `os-notifications`
 - OS notifications will be shown by default
+
+  - `--notification` is now deprecated
 
 ### Added
 
@@ -63,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trigger a system notification on build completion with `--notification`
 - Output the content of the notification as a JSON object with `--output-notification-json`
 
-[unreleased]: https://github.com/liamdawson/buildkite_waiter/compare/v0.1.1...HEAD
+[unreleased]: https://github.com/liamdawson/buildkite_waiter/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/liamdawson/buildkite_waiter/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/liamdawson/buildkite_waiter/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/liamdawson/buildkite_waiter/compare/v0.0.1-alpha.3...v0.1.0
 [0.0.1-alpha.3]: https://github.com/liamdawson/buildkite_waiter/releases/tag/v0.0.1-alpha.3
