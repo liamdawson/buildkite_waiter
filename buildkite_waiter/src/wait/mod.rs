@@ -1,3 +1,5 @@
+mod retry;
+
 use super::api_auth;
 use anyhow::Context;
 use buildkite_rust::{Build, Buildkite};
@@ -34,10 +36,9 @@ where
     let mut timeout = delay_for(timeout_duration);
 
     while !build.is_finished() {
-        let poll_pause =
-            Duration::from_secs(u64::from(runtime_args.request_cooldown.unwrap_or(60)));
+        let poll_pause = Duration::from_secs(30);
 
-        debug!("Waiting {:?} to poll build", poll_pause);
+        debug!("Waiting {:?}s to poll build", poll_pause);
 
         delay_for(poll_pause).await;
 
@@ -49,7 +50,7 @@ where
             _ = &mut timeout => {
                 anyhow::bail!("Timed out waiting for build.");
             },
-            get_result = client.build().by_url(build_url) => get_result,
+            get_result = retry::attempt_build_by_url(&client, &build_url, 3) => get_result,
         };
 
         build = get_result

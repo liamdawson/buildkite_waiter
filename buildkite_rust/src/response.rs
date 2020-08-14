@@ -1,6 +1,8 @@
 use once_cell::sync::OnceCell;
 use serde::de::DeserializeOwned;
 
+pub type ResponseError = reqwest::Error;
+
 #[derive(Debug)]
 pub struct ApiResponse<TExpected: DeserializeOwned> {
     // TODO: reduce implementation exposure?
@@ -13,7 +15,7 @@ pub struct ApiResponse<TExpected: DeserializeOwned> {
 }
 
 impl<TExpected: DeserializeOwned> ApiResponse<TExpected> {
-    pub(crate) async fn from_reqwest(response: reqwest::Response) -> Result<Self, reqwest::Error> {
+    pub(crate) async fn from_reqwest(response: reqwest::Response) -> Result<Self, ResponseError> {
         let error_for_status = response.error_for_status_ref().err();
 
         Ok(Self {
@@ -26,14 +28,18 @@ impl<TExpected: DeserializeOwned> ApiResponse<TExpected> {
         })
     }
 
-    pub fn error_for_status(self) -> Result<Self, reqwest::Error> {
+    pub fn is_success(&self) -> bool {
+        self.error_for_status.is_none()
+    }
+
+    pub fn error_for_status(self) -> Result<Self, ResponseError> {
         match self.error_for_status {
             Some(e) => Err(e),
             _ => Ok(self),
         }
     }
 
-    pub fn error_for_status_ref(&self) -> Result<&Self, &reqwest::Error> {
+    pub fn error_for_status_ref(&self) -> Result<&Self, &ResponseError> {
         match self.error_for_status.as_ref() {
             Some(e) => Err(e),
             _ => Ok(&self),
