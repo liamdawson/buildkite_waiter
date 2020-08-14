@@ -1,4 +1,3 @@
-use structopt::clap::AppSettings;
 use structopt::StructOpt;
 use url::Url;
 
@@ -50,12 +49,6 @@ pub enum Command {
         #[structopt(flatten)]
         strategy: LatestStrategyArgs,
     },
-    #[structopt(
-        setting(AppSettings::Hidden),
-        setting(AppSettings::TrailingVarArg),
-        setting(AppSettings::AllowLeadingHyphen)
-    )]
-    Wait { raw_parameters: Vec<String> },
 }
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]

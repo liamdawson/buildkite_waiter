@@ -23,12 +23,6 @@ async fn main() -> anyhow::Result<()> {
     configure_logger()?;
 
     let exit_code = match Command::from_args() {
-        Command::Wait { raw_parameters: _ } => {
-            println!("Wait has been replaced with by-url and by-number.");
-            println!("Try `buildkite_waiter help` to see available commands.");
-
-            Ok(1)
-        }
         Command::ByNumber {
             output,
             runtime,
