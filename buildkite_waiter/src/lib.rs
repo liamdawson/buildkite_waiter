@@ -1,8 +1,10 @@
 mod credentials;
 mod build;
+pub mod buildkite;
 mod http;
 
 pub use credentials::BuildkiteCredentials;
+pub use build::*;
 
 use once_cell::sync::Lazy;
 

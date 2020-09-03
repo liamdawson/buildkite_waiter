@@ -6,7 +6,6 @@ use structopt::StructOpt;
 
 mod api_auth;
 mod cli;
-mod find;
 mod output;
 mod wait;
 
@@ -31,7 +30,14 @@ async fn main() -> anyhow::Result<()> {
             let client = buildkite_waiter::Buildkite::default();
             let credentials = api_auth::fetch_credentials()?;
 
-            let build = client.build_by_number(credentials, &strategy.organization, &strategy.pipeline, &format!("{}", strategy.number)).await?;
+            let build = client
+                .build_by_number(
+                    credentials,
+                    &strategy.organization,
+                    &strategy.pipeline,
+                    &format!("{}", strategy.number),
+                )
+                .await?;
 
             wait::by_url(&build.url, runtime, output).await
         }
@@ -40,24 +46,60 @@ async fn main() -> anyhow::Result<()> {
             runtime,
             strategy,
         } => {
-            wait::for_build(
-                |client| async move { strategy.find_build(&client).await },
-                runtime,
-                output,
-            )
-            .await
+            let client = buildkite_waiter::Buildkite::default();
+            let credentials = api_auth::fetch_credentials()?;
+
+            let (organization, pipeline, number) =
+                buildkite_waiter::buildkite::build_number_from_url(strategy.url.as_str())?;
+
+            let build = client
+                .build_by_number(credentials, &organization, &pipeline, &number)
+                .await?;
+
+            wait::by_url(&build.url, runtime, output).await
         }
         Command::Latest {
             output,
             runtime,
             strategy,
         } => {
-            wait::for_build(
-                |client| async move { strategy.find_build(&client).await },
-                runtime,
-                output,
-            )
-            .await
+            let client = buildkite_waiter::Buildkite::default();
+            let credentials = api_auth::fetch_credentials()?;
+
+            let scope = if let Some(organization) = strategy.organization {
+                if let Some(pipeline) = strategy.pipeline {
+                    buildkite_waiter::BuildScope::Pipeline(organization, pipeline)
+                } else {
+                    buildkite_waiter::BuildScope::Organization(organization)
+                }
+            } else {
+                buildkite_waiter::BuildScope::All
+            };
+
+            let creator = if let Some(creator) = strategy.creator {
+                Some(creator)
+            } else if strategy.mine {
+                todo!()
+            } else {
+                None
+            };
+
+            let build = client
+                .latest_build(
+                    credentials,
+                    scope,
+                    strategy.branch.iter().map(|x| &**x).collect::<Vec<_>>().as_slice(),
+                    creator.iter().map(|x| &**x).collect::<Vec<_>>().pop(),
+                    strategy.commit.iter().map(|x| &**x).collect::<Vec<_>>().pop(),
+                    strategy.state.iter().map(|x| &**x).collect::<Vec<_>>().as_slice()
+                )
+                .await?; //  &strategy.organization, &strategy.pipeline, &format!("{}", strategy.number)).await?;
+
+            if let Some(build) = build {
+                wait::by_url(&build.url, runtime, output).await
+            } else {
+                Err(anyhow::anyhow!("No matching builds were found"))
+            }
         }
         Command::Login => login::login(),
         Command::Logout => logout::logout(),
