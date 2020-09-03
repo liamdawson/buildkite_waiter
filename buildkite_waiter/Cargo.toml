@@ -17,7 +17,7 @@ os-notifications = ["notifica"]
 buildkite_rust = { path = "../buildkite_rust" }
 
 anyhow = "1.0.32"
-chrono = "0.4.13"
+chrono = "0.4.15"
 chrono-humanize = "0.0.11"
 clap = "2.33.3"
 console = "0.12.0"
@@ -27,13 +27,16 @@ keyring = "0.9.0"
 log = "0.4.11"
 serde = { version = "1.0.115", features = ["derive"] }
 serde_json = "1.0.57"
-structopt = "0.3.16"
-tokio = { version = "0.2", features = ["full"] }
+structopt = "0.3.17"
+tokio = { version = "0.2.22", features = ["full"] }
 url = "2.1.1"
+reqwest = { version = "0.10.8", features = ["json"] }
+secrecy = "0.7.0"
+once_cell = "1.4.1"
 
 # feature os-notifications
 notifica = { version = "2.0.0", optional = true }
 
 [build-dependencies]
-structopt = "0.3.16"
+structopt = "0.3.17"
 url = "2.1.1"

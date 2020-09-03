@@ -28,12 +28,12 @@ async fn main() -> anyhow::Result<()> {
             runtime,
             strategy,
         } => {
-            wait::for_build(
-                |client| async move { strategy.find_build(&client).await },
-                runtime,
-                output,
-            )
-            .await
+            let client = buildkite_waiter::Buildkite::default();
+            let credentials = api_auth::fetch_credentials()?;
+
+            let build = client.build_by_number(credentials, &strategy.organization, &strategy.pipeline, &format!("{}", strategy.number)).await?;
+
+            wait::by_url(&build.url, runtime, output).await
         }
         Command::ByUrl {
             output,

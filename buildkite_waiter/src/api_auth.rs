@@ -1,6 +1,8 @@
 use anyhow::Context;
 use buildkite_rust::Buildkite;
 use keyring::Keyring;
+use buildkite_waiter::BuildkiteCredentials;
+use secrecy::SecretString;
 
 pub fn keyring_entry() -> Keyring<'static> {
     Keyring::new(crate::APP_ID, "https://api.buildkite.com/v2/")
@@ -20,4 +22,11 @@ pub fn client() -> anyhow::Result<Buildkite> {
         .context("Unable to retrieve a saved API token")?;
 
     Ok(Buildkite::authenticated(access_token))
+}
+
+pub fn fetch_credentials() -> anyhow::Result<BuildkiteCredentials> {
+    let token = keyring_entry()
+        .get_password()?;
+
+    Ok(BuildkiteCredentials::ApiAccessToken(SecretString::new(token)))
 }

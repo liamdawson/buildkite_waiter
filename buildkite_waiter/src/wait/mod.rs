@@ -7,6 +7,16 @@ use std::{future::Future, time::Duration};
 use tokio::time::delay_for;
 use url::Url;
 
+pub async fn by_url(url: &str, runtime_args: crate::cli::RuntimeArgs, output: crate::cli::OutputArgs) -> anyhow::Result<i32> {
+    for_build(|client| async move {
+        let resp = client.build().by_url(url::Url::parse(url).expect("API returned invalid URL")).await.context("Request could not complete")?;
+        let success = resp.error_for_status().context("Request was unsuccessful")?;
+        let build = success.body().context("Unexpected response body")?;
+
+        Ok(build.clone())
+    }, runtime_args, output).await
+}
+
 pub async fn for_build<F, Fut>(
     build_fn: F,
     runtime_args: crate::cli::RuntimeArgs,
