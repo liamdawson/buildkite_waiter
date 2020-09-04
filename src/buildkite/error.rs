@@ -3,5 +3,5 @@ pub enum RequestError {
     #[error("this call requires credentials")]
     CredentialsRequired,
     #[error(transparent)]
-    ReqwestError(#[from] reqwest::Error)
+    ReqwestError(#[from] reqwest::Error),
 }

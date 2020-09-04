@@ -1,7 +1,7 @@
-use crate::Buildkite;
-use reqwest::Method;
 use super::error::RequestError;
-use chrono::{Utc, DateTime};
+use crate::Buildkite;
+use chrono::{DateTime, Utc};
+use reqwest::Method;
 
 #[derive(serde::Deserialize)]
 pub struct ApiUser {

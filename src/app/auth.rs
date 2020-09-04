@@ -1,5 +1,5 @@
+use buildkite_waiter::{Buildkite, BuildkiteCredentials};
 use keyring::Keyring;
-use buildkite_waiter::{Buildkite,BuildkiteCredentials};
 use secrecy::SecretString;
 
 pub fn keyring_entry() -> Keyring<'static> {
@@ -7,11 +7,11 @@ pub fn keyring_entry() -> Keyring<'static> {
 }
 
 pub fn fetch_credentials() -> anyhow::Result<BuildkiteCredentials> {
-    let token = keyring_entry()
-        .get_password()
-        .map_err(serialize_error)?;
+    let token = keyring_entry().get_password().map_err(serialize_error)?;
 
-    Ok(BuildkiteCredentials::ApiAccessToken(SecretString::new(token)))
+    Ok(BuildkiteCredentials::ApiAccessToken(SecretString::new(
+        token,
+    )))
 }
 
 // Currently, keyring uses dbus 0.2.3, which doesn't impl Sync on the error type

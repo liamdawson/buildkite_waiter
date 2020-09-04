@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate log;
 
+use anyhow::Context;
 use cli::Command;
 use structopt::StructOpt;
-use anyhow::Context;
 
 mod api_auth;
 mod app;
@@ -85,10 +85,25 @@ async fn main() -> anyhow::Result<()> {
             let build = client
                 .latest_build(
                     scope,
-                    strategy.branch.iter().map(|x| &**x).collect::<Vec<_>>().as_slice(),
+                    strategy
+                        .branch
+                        .iter()
+                        .map(|x| &**x)
+                        .collect::<Vec<_>>()
+                        .as_slice(),
                     creator.iter().map(|x| &**x).collect::<Vec<_>>().pop(),
-                    strategy.commit.iter().map(|x| &**x).collect::<Vec<_>>().pop(),
-                    strategy.state.iter().map(|x| &**x).collect::<Vec<_>>().as_slice()
+                    strategy
+                        .commit
+                        .iter()
+                        .map(|x| &**x)
+                        .collect::<Vec<_>>()
+                        .pop(),
+                    strategy
+                        .state
+                        .iter()
+                        .map(|x| &**x)
+                        .collect::<Vec<_>>()
+                        .as_slice(),
                 )
                 .await?; //  &strategy.organization, &strategy.pipeline, &format!("{}", strategy.number)).await?;
 

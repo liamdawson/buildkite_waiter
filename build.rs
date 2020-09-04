@@ -1,9 +1,9 @@
 extern crate structopt;
 
-use structopt::clap::Shell;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::{path::PathBuf, env};
+use std::{env, path::PathBuf};
+use structopt::clap::Shell;
 
 include!("src/cli.rs");
 

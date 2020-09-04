@@ -1,7 +1,7 @@
-use crate::Buildkite;
-use reqwest::Method;
 use super::error::RequestError;
-use chrono::{Utc, DateTime};
+use crate::Buildkite;
+use chrono::{DateTime, Utc};
+use reqwest::Method;
 
 pub enum BuildScope {
     All,
@@ -68,7 +68,7 @@ impl Buildkite {
                 &format!(
                     "organizations/{}/pipelines/{}/builds/{}",
                     organization, pipeline, number
-                )
+                ),
             )?
             .send()
             .await?
@@ -87,8 +87,13 @@ impl Buildkite {
     ) -> OptionalFindResult {
         let path = match scope {
             BuildScope::All => format!("{}", "builds"),
-            BuildScope::Organization(organization) => format!("organizations/{}/builds", &organization),
-            BuildScope::Pipeline(organization, pipeline) => format!("organizations/{}/pipelines/{}/builds", &organization, &pipeline),
+            BuildScope::Organization(organization) => {
+                format!("organizations/{}/builds", &organization)
+            }
+            BuildScope::Pipeline(organization, pipeline) => format!(
+                "organizations/{}/pipelines/{}/builds",
+                &organization, &pipeline
+            ),
         };
 
         let mut query = Vec::new();
@@ -105,10 +110,7 @@ impl Buildkite {
         }
 
         let mut builds: Vec<Build> = self
-            .path_request(
-                Method::GET,
-                &path
-            )?
+            .path_request(Method::GET, &path)?
             .query(query.as_slice())
             .send()
             .await?

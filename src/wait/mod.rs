@@ -6,12 +6,24 @@ use std::{future::Future, time::Duration};
 use tokio::time::delay_for;
 use url::Url;
 
-pub async fn by_url(url: &str, runtime_args: crate::cli::RuntimeArgs, output: crate::cli::OutputArgs) -> anyhow::Result<i32> {
-    for_build(|client| async move {
-        let resp = client.build_by_url(url).await.context("Failed to retrieve build")?;
+pub async fn by_url(
+    url: &str,
+    runtime_args: crate::cli::RuntimeArgs,
+    output: crate::cli::OutputArgs,
+) -> anyhow::Result<i32> {
+    for_build(
+        |client| async move {
+            let resp = client
+                .build_by_url(url)
+                .await
+                .context("Failed to retrieve build")?;
 
-        Ok(resp)
-    }, runtime_args, output).await
+            Ok(resp)
+        },
+        runtime_args,
+        output,
+    )
+    .await
 }
 
 pub async fn for_build<F, Fut>(

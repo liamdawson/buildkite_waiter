@@ -51,11 +51,11 @@ impl crate::cli::OutputArgs {
             "state-url" => {
                 writeln!(std::io::stderr()).ok();
                 println!("{} {}", style_state(&build.state), build.web_url);
-            },
+            }
             "notification-lines" => {
                 println!("{}", notification_content.title);
                 println!("{}", notification_content.message);
-            },
+            }
             _ => {
                 // should only occur if a new possible_value is added to cli.rs
                 unreachable!("Output format has not been defined")

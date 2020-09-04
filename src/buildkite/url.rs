@@ -33,11 +33,13 @@ pub fn build_number(input: &str) -> Result<(String, String, String), UrlError> {
             _ => Err(UrlError::UnknownFormat),
         },
         Some("api.buildkite.com") => match segments.as_slice() {
-            ["v2", "organizations", organization, "pipelines", pipeline, "builds", raw_number] => Ok((
-                organization.to_string(),
-                pipeline.to_string(),
-                raw_number.to_string(),
-            )),
+            ["v2", "organizations", organization, "pipelines", pipeline, "builds", raw_number] => {
+                Ok((
+                    organization.to_string(),
+                    pipeline.to_string(),
+                    raw_number.to_string(),
+                ))
+            }
             _ => Err(UrlError::UnknownFormat),
         },
         _ => Err(UrlError::UnknownFormat),
