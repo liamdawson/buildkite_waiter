@@ -17,7 +17,7 @@ os-notifications = ["notifica"]
 # buildkite_rust = { path = "../buildkite_rust" }
 
 anyhow = "1.0.32"
-chrono = "0.4.15"
+chrono = { version = "0.4.15", features = ["serde"] }
 chrono-humanize = "0.0.11"
 clap = "2.33.3"
 console = "0.12.0"
