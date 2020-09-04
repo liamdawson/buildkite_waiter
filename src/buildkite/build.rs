@@ -35,10 +35,7 @@ pub struct BuildCreator {
 impl Build {
     pub fn is_finished(&self) -> bool {
         // Corresponds to the `finished` state for the Buildkite API:
-        match self.state.as_str() {
-            "passed" | "failed" | "blocked" | "canceled" => true,
-            _ => false,
-        }
+        super::build_states::FINISHED_BUILD_STATES.contains(&self.state.as_str())
     }
 }
 

@@ -5,15 +5,11 @@ use anyhow::Context;
 use cli::Command;
 use structopt::StructOpt;
 
-mod api_auth;
 mod app;
 mod cli;
+mod commands;
 mod output;
 mod wait;
-
-// commands
-mod login;
-mod logout;
 
 pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
 pub const DEVELOPER_IDENTIFIER: &str = "com.ldaws";
@@ -113,8 +109,8 @@ async fn main() -> anyhow::Result<()> {
                 Err(anyhow::anyhow!("No matching builds were found"))
             }
         }
-        Command::Login => login::login(),
-        Command::Logout => logout::logout(),
+        Command::Login => commands::login(),
+        Command::Logout => commands::logout(),
     }?;
 
     std::process::exit(exit_code);

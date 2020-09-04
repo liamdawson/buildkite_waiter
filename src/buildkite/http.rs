@@ -1,4 +1,5 @@
-use super::{error::RequestError, Buildkite, BuildkiteCredentials};
+use crate::Buildkite;
+use super::{error::RequestError, BuildkiteCredentials};
 use once_cell::sync::Lazy;
 use reqwest::{Client, Method, RequestBuilder};
 use secrecy::ExposeSecret;

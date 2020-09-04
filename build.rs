@@ -7,6 +7,12 @@ use structopt::clap::Shell;
 
 include!("src/cli.rs");
 
+pub mod buildkite_waiter {
+    pub mod build_states {
+        include!("src/buildkite/build_states.rs");
+    }
+}
+
 fn main() {
     let target_dir = match env::var_os("OUT_DIR") {
         // if no OUT_DIR, no need to write man/completions

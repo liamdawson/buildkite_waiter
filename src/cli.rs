@@ -1,19 +1,11 @@
 use structopt::StructOpt;
 use url::Url;
 
-fn allowed_build_states() -> &'static [&'static str] {
-    &[
-        "running",
-        "scheduled",
-        "passed",
-        "failed",
-        "blocked",
-        "canceled",
-        "canceling",
-        "skipped",
-        "not_run",
-        "finished",
-    ]
+fn allowed_build_states() -> Vec<&'static str> {
+    let mut states = Vec::from(buildkite_waiter::build_states::KNOWN_BUILD_STATES);
+    states.push("finished");
+
+    states
 }
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]
@@ -80,7 +72,7 @@ pub struct LatestStrategyArgs {
     #[structopt(long)]
     /// Find build by (long) commit hash
     pub commit: Option<String>,
-    #[structopt(long, possible_values = allowed_build_states())]
+    #[structopt(long, possible_values = allowed_build_states().as_slice())]
     pub state: Vec<String>,
 }
 

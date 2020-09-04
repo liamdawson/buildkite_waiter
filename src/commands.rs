@@ -1,4 +1,4 @@
-use crate::api_auth;
+use crate::app::auth;
 use anyhow::Context;
 
 pub fn login() -> anyhow::Result<i32> {
@@ -11,10 +11,21 @@ pub fn login() -> anyhow::Result<i32> {
         .with_prompt("Buildkite API Access Token")
         .interact()?;
 
-    api_auth::keyring_entry()
+    auth::keyring_entry()
         .set_password(&access_token)
-        .map_err(api_auth::serialize_error)
+        .map_err(auth::serialize_error)
         .context("Failed to save API token")?;
+
+    println!("{}", console::style("OK").green());
+
+    Ok(0)
+}
+
+pub fn logout() -> anyhow::Result<i32> {
+    auth::keyring_entry()
+        .delete_password()
+        .map_err(auth::serialize_error)
+        .context("Failed to delete saved API token")?;
 
     println!("{}", console::style("OK").green());
 
