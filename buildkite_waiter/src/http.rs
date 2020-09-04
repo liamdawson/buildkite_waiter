@@ -1,5 +1,5 @@
 use reqwest::{Method, RequestBuilder, Client};
-use super::{Buildkite, BuildkiteCredentials};
+use super::{Buildkite, BuildkiteCredentials, error::RequestError};
 use std::time::Duration;
 use secrecy::ExposeSecret;
 use once_cell::sync::Lazy;
@@ -23,8 +23,14 @@ fn build_client() -> reqwest::Result<Client> {
 }
 
 impl Buildkite {
-    pub(crate) fn request(&self, method: Method, url: &str, credentials: BuildkiteCredentials) -> reqwest::Result<RequestBuilder> {
+    pub(crate) fn request(&self, method: Method, url: &str) -> Result<RequestBuilder, RequestError> {
         let client = build_client()?;
+
+        let credentials = if let Some(credentials) = &self.credentials {
+            credentials
+        } else {
+            return Err(RequestError::CredentialsRequired)
+        };
 
         let mut builder = client.request(method, url);
 
@@ -35,9 +41,9 @@ impl Buildkite {
         Ok(builder)
     }
 
-    pub(crate) fn path_request(&self, method: Method, path: &str, credentials: BuildkiteCredentials) -> reqwest::Result<RequestBuilder> {
+    pub(crate) fn path_request(&self, method: Method, path: &str) -> Result<RequestBuilder, RequestError> {
         let url = format!("{}/{}", self.api_url, path);
 
-        self.request(method, &url, credentials)
+        self.request(method, &url)
     }
 }

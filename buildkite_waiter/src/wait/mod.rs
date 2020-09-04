@@ -1,19 +1,16 @@
 mod retry;
 
-use super::api_auth;
 use anyhow::Context;
-use buildkite_rust::{Build, Buildkite};
+use buildkite_waiter::{Build, Buildkite};
 use std::{future::Future, time::Duration};
 use tokio::time::delay_for;
 use url::Url;
 
 pub async fn by_url(url: &str, runtime_args: crate::cli::RuntimeArgs, output: crate::cli::OutputArgs) -> anyhow::Result<i32> {
     for_build(|client| async move {
-        let resp = client.build().by_url(url::Url::parse(url).expect("API returned invalid URL")).await.context("Request could not complete")?;
-        let success = resp.error_for_status().context("Request was unsuccessful")?;
-        let build = success.body().context("Unexpected response body")?;
+        let resp = client.build_by_url(url).await.context("Failed to retrieve build")?;
 
-        Ok(build.clone())
+        Ok(resp)
     }, runtime_args, output).await
 }
 
@@ -30,7 +27,7 @@ where
         warn!("--notification is deprecated: os notifications are now sent by default");
     }
 
-    let client = api_auth::client().context("Unable to prepare a Buildkite client")?;
+    let client = crate::app::auth::client().context("Unable to prepare a Buildkite client")?;
 
     let mut build = build_fn(client.clone())
         .await
@@ -63,13 +60,7 @@ where
             get_result = retry::attempt_build_by_url(&client, &build_url, 3) => get_result,
         };
 
-        build = get_result
-            .context("Unable to retrieve build details")?
-            .error_for_status()
-            .context("Server response was not successful")?
-            .body()
-            .context("Unable to deserialize response body")?
-            .clone();
+        build = get_result.context("Unable to retrieve build details")?;
     }
 
     Ok(output.on_completion(&build).await)

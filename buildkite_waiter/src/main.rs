@@ -3,8 +3,10 @@ extern crate log;
 
 use cli::Command;
 use structopt::StructOpt;
+use anyhow::Context;
 
 mod api_auth;
+mod app;
 mod cli;
 mod output;
 mod wait;
@@ -27,12 +29,10 @@ async fn main() -> anyhow::Result<()> {
             runtime,
             strategy,
         } => {
-            let client = buildkite_waiter::Buildkite::default();
-            let credentials = api_auth::fetch_credentials()?;
+            let client = app::auth::client()?;
 
             let build = client
                 .build_by_number(
-                    credentials,
                     &strategy.organization,
                     &strategy.pipeline,
                     &format!("{}", strategy.number),
@@ -46,14 +46,13 @@ async fn main() -> anyhow::Result<()> {
             runtime,
             strategy,
         } => {
-            let client = buildkite_waiter::Buildkite::default();
-            let credentials = api_auth::fetch_credentials()?;
+            let client = app::auth::client()?;
 
             let (organization, pipeline, number) =
-                buildkite_waiter::buildkite::build_number_from_url(strategy.url.as_str())?;
+                buildkite_waiter::url::build_number(strategy.url.as_str())?;
 
             let build = client
-                .build_by_number(credentials, &organization, &pipeline, &number)
+                .build_by_number(&organization, &pipeline, &number)
                 .await?;
 
             wait::by_url(&build.url, runtime, output).await
@@ -63,8 +62,7 @@ async fn main() -> anyhow::Result<()> {
             runtime,
             strategy,
         } => {
-            let client = buildkite_waiter::Buildkite::default();
-            let credentials = api_auth::fetch_credentials()?;
+            let client = app::auth::client()?;
 
             let scope = if let Some(organization) = strategy.organization {
                 if let Some(pipeline) = strategy.pipeline {
@@ -79,14 +77,13 @@ async fn main() -> anyhow::Result<()> {
             let creator = if let Some(creator) = strategy.creator {
                 Some(creator)
             } else if strategy.mine {
-                todo!()
+                Some(client.get_access_token_holder().await.context("Unable to determine the current user (the API Access Token may need the \"Read User\" permission)")?.id)
             } else {
                 None
             };
 
             let build = client
                 .latest_build(
-                    credentials,
                     scope,
                     strategy.branch.iter().map(|x| &**x).collect::<Vec<_>>().as_slice(),
                     creator.iter().map(|x| &**x).collect::<Vec<_>>().pop(),

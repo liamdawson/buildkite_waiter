@@ -14,7 +14,7 @@ default = ["os-notifications"]
 os-notifications = ["notifica"]
 
 [dependencies]
-buildkite_rust = { path = "../buildkite_rust" }
+# buildkite_rust = { path = "../buildkite_rust" }
 
 anyhow = "1.0.32"
 chrono = "0.4.15"

@@ -10,7 +10,7 @@ pub enum UrlError {
     UnknownFormat,
 }
 
-pub fn build_number_from_url(input: &str) -> Result<(String, String, String), UrlError> {
+pub fn build_number(input: &str) -> Result<(String, String, String), UrlError> {
     let parsed = Url::parse(input)?;
 
     if parsed.cannot_be_a_base() {
@@ -57,7 +57,7 @@ mod tests {
             "87".to_string(),
         );
 
-        let subject = build_number_from_url(input).expect("Unable to parse valid URL");
+        let subject = build_number(input).expect("Unable to parse valid URL");
 
         assert_eq!(subject, expected);
     }
@@ -71,7 +71,7 @@ mod tests {
             "1".to_string(),
         );
 
-        let subject = build_number_from_url(input).expect("Unable to parse valid URL");
+        let subject = build_number(input).expect("Unable to parse valid URL");
 
         assert_eq!(subject, expected);
     }

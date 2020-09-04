@@ -1,4 +1,4 @@
-use buildkite_rust::Build;
+use buildkite_waiter::Build;
 use serde::Serialize;
 
 #[derive(Serialize)]

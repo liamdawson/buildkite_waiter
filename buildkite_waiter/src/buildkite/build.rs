@@ -1,5 +1,7 @@
-use super::{Buildkite, BuildkiteCredentials};
+use crate::Buildkite;
 use reqwest::Method;
+use super::error::RequestError;
+use chrono::{Utc, DateTime};
 
 pub enum BuildScope {
     All,
@@ -8,18 +10,45 @@ pub enum BuildScope {
 }
 
 #[derive(serde::Deserialize)]
-pub struct BuildInfo {
+pub struct Build {
     pub number: u64,
     pub url: String,
+    pub web_url: String,
+    pub state: String,
+    pub pipeline: BuildPipeline,
+    pub creator: Option<BuildCreator>,
+    pub branch: String,
+    pub message: Option<String>,
+    pub finished_at: Option<DateTime<Utc>>,
 }
 
-type FindResult = Result<BuildInfo, reqwest::Error>;
-type OptionalFindResult = Result<Option<BuildInfo>, reqwest::Error>;
+#[derive(serde::Deserialize)]
+pub struct BuildPipeline {
+    pub slug: String,
+}
+
+#[derive(serde::Deserialize)]
+pub struct BuildCreator {
+    pub name: Option<String>,
+}
+
+impl Build {
+    pub fn is_finished(&self) -> bool {
+        // Corresponds to the `finished` state for the Buildkite API:
+        match self.state.as_str() {
+            "passed" | "failed" | "blocked" | "canceled" => true,
+            _ => false,
+        }
+    }
+}
+
+type FindResult = Result<Build, RequestError>;
+type OptionalFindResult = Result<Option<Build>, RequestError>;
 
 impl Buildkite {
-    pub async fn build_by_url(&self, credentials: BuildkiteCredentials, url: &str) -> FindResult {
+    pub async fn build_by_url(&self, url: &str) -> FindResult {
         Ok(self
-            .request(Method::GET, url, credentials)?
+            .request(Method::GET, url)?
             .send()
             .await?
             .error_for_status()?
@@ -29,7 +58,6 @@ impl Buildkite {
 
     pub async fn build_by_number(
         &self,
-        credentials: BuildkiteCredentials,
         organization: &str,
         pipeline: &str,
         number: &str,
@@ -40,8 +68,7 @@ impl Buildkite {
                 &format!(
                     "organizations/{}/pipelines/{}/builds/{}",
                     organization, pipeline, number
-                ),
-                credentials,
+                )
             )?
             .send()
             .await?
@@ -52,7 +79,6 @@ impl Buildkite {
 
     pub async fn latest_build(
         &self,
-        credentials: BuildkiteCredentials,
         scope: BuildScope,
         branches: &[&str],
         creator: Option<&str>,
@@ -78,11 +104,10 @@ impl Buildkite {
             query.push(("commit", commit));
         }
 
-        let mut builds: Vec<BuildInfo> = self
+        let mut builds: Vec<Build> = self
             .path_request(
                 Method::GET,
-                &path,
-                credentials,
+                &path
             )?
             .query(query.as_slice())
             .send()

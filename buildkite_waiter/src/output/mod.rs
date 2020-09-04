@@ -2,7 +2,8 @@ mod notification;
 
 pub use notification::NotificationContent;
 
-use buildkite_rust::{Build, BuildState};
+// use buildkite_rust::{Build, BuildState};
+use buildkite_waiter::Build;
 use console::style;
 use std::io::Write;
 
@@ -49,7 +50,7 @@ impl crate::cli::OutputArgs {
             "none" => {}
             "state-url" => {
                 writeln!(std::io::stderr()).ok();
-                println!("{} {}", style_state(build.state), build.web_url);
+                println!("{} {}", style_state(&build.state), build.web_url);
             },
             "notification-lines" => {
                 println!("{}", notification_content.title);
@@ -68,20 +69,20 @@ impl crate::cli::OutputArgs {
             }
         }
 
-        match build.state {
-            BuildState::Passed | BuildState::Blocked => 0,
+        match build.state.as_str() {
+            "passed" | "blocked" => 0,
             _ => 2,
         }
     }
 }
 
-fn style_state(state: BuildState) -> String {
+fn style_state(state: &str) -> String {
     let state_str = format!("{:?}", state);
 
     let colored = match state {
-        BuildState::Passed => style(state_str).green(),
-        BuildState::Blocked => style(state_str).yellow(),
-        BuildState::Failed | BuildState::Canceled => style(state_str).red(),
+        "passed" => style(state_str).green(),
+        "blocked" => style(state_str).yellow(),
+        "failed" | "canceled" => style(state_str).red(),
         _ => style(state_str).magenta(),
     };
 
