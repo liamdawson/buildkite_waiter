@@ -2,9 +2,9 @@ mod notification;
 
 pub use notification::NotificationContent;
 
-// use buildkite_rust::{Build, BuildState};
 use buildkite_waiter::Build;
 use console::style;
+use heck::TitleCase;
 use std::io::Write;
 
 impl crate::cli::OutputArgs {
@@ -77,7 +77,7 @@ impl crate::cli::OutputArgs {
 }
 
 fn style_state(state: &str) -> String {
-    let state_str = format!("{:?}", state);
+    let state_str = state.to_title_case();
 
     let colored = match state {
         "passed" => style(state_str).green(),
