@@ -23,7 +23,7 @@ Ensure you enable "Read Builds", and optionally "Read User".
 Buildkite API Access Token:
 OK
 
-# wait for the latest build triggered by the logged in user, receive a notification when done
+# wait for the latest build triggered by the logged in user, receive a notification when done (requires "Read User" permission)
 $ buildkite_waiter latest --mine
 
 # wait for the latest build on the main branch for my-pipeline in my-great-org
