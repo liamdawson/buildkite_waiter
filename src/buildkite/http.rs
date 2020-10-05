@@ -1,5 +1,5 @@
-use crate::Buildkite;
 use super::{error::RequestError, BuildkiteCredentials};
+use crate::Buildkite;
 use once_cell::sync::Lazy;
 use reqwest::{Client, Method, RequestBuilder};
 use secrecy::ExposeSecret;

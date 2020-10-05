@@ -73,7 +73,12 @@ async fn main() -> anyhow::Result<()> {
             let creator = if let Some(creator) = strategy.creator {
                 Some(creator)
             } else if strategy.mine {
-                Some(client.get_access_token_holder().await.context("Unable to determine the current user (the API Access Token may need the \"Read User\" permission)")?.id)
+                let id = client.get_access_token_holder()
+                    .await
+                    .context("Unable to determine the current user (the API Access Token may need the \"Read User\" permission)")?
+                    .id;
+
+                Some(id)
             } else {
                 None
             };
@@ -101,8 +106,7 @@ async fn main() -> anyhow::Result<()> {
                         .collect::<Vec<_>>()
                         .as_slice(),
                 )
-                .await?; //  &strategy.organization, &strategy.pipeline, &format!("{}", strategy.number)).await?;
-
+                .await?;
             if let Some(build) = build {
                 wait::by_url(&build.url, runtime, output).await
             } else {
