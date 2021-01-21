@@ -1,9 +1,7 @@
-use super::{error::RequestError, BuildkiteCredentials};
+use super::BuildkiteCredentials;
 use crate::Buildkite;
 use once_cell::sync::Lazy;
-use reqwest::{Client, Method, RequestBuilder};
 use secrecy::ExposeSecret;
-use std::time::Duration;
 
 // allow compile-time overrides
 pub static USER_AGENT: Lazy<&'static str> =
@@ -21,44 +19,25 @@ pub const DEFAULT_USER_AGENT: &str = concat!(
     "-dev"
 );
 
-fn build_client() -> reqwest::Result<Client> {
-    Client::builder()
-        .connect_timeout(Duration::from_secs(5))
-        .timeout(Duration::from_secs(15))
-        .user_agent(*USER_AGENT)
-        .build()
-}
-
 impl Buildkite {
-    pub(crate) fn request(
-        &self,
-        method: Method,
-        url: &str,
-    ) -> Result<RequestBuilder, RequestError> {
-        let client = build_client()?;
+    pub(crate) fn request(&self, method: &str, url: &str) -> ureq::Request {
+        let mut req = self.agent.request(method, url);
 
-        let credentials = if let Some(credentials) = &self.credentials {
-            credentials
-        } else {
-            return Err(RequestError::CredentialsRequired);
-        };
+        if let Some(credentials) = &self.credentials {
+            match credentials {
+                BuildkiteCredentials::ApiAccessToken(token) => {
+                    req = req.set(
+                        "Authorization",
+                        &format!("Bearer {}", token.expose_secret()),
+                    )
+                }
+            };
+        }
 
-        let mut builder = client.request(method, url);
-
-        builder = match credentials {
-            BuildkiteCredentials::ApiAccessToken(token) => {
-                builder.bearer_auth(&token.expose_secret())
-            }
-        };
-
-        Ok(builder)
+        req.set("User-Agent", &USER_AGENT)
     }
 
-    pub(crate) fn path_request(
-        &self,
-        method: Method,
-        path: &str,
-    ) -> Result<RequestBuilder, RequestError> {
+    pub(crate) fn path_request(&self, method: &str, path: &str) -> ureq::Request {
         let url = format!("{}/{}", self.api_url, path);
 
         self.request(method, &url)

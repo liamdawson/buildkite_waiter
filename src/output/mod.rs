@@ -16,7 +16,7 @@ impl crate::cli::OutputArgs {
         let mut line = format!(
             "{} {}",
             style("Waiting for").dim(),
-            style(format!("{}/{}", &build.pipeline.slug, &build.number)).green()
+            style(format!("{}/{}", &build.pipeline.slug, &build.number)).green(),
         );
         if let Some(creator) = &build.creator {
             if let Some(name) = &creator.name {
@@ -24,13 +24,14 @@ impl crate::cli::OutputArgs {
             }
         }
         line = format!(
-            "{} {}",
+            "{} {}: {}",
             line,
             format!(
                 "{} {}",
                 style("on branch").dim(),
-                style(&build.branch).cyan()
-            )
+                style(&build.branch).cyan(),
+            ),
+            &build.web_url,
         );
 
         // use writeln! and .ok(), because it's fine if the output couldn't be written
@@ -43,7 +44,7 @@ impl crate::cli::OutputArgs {
         }
     }
 
-    pub async fn on_completion(&self, build: &Build) -> i32 {
+    pub fn on_completion(&self, build: &Build) -> i32 {
         let notification_content: NotificationContent = build.into();
 
         match self.output.as_str() {
@@ -64,7 +65,7 @@ impl crate::cli::OutputArgs {
 
         #[cfg(feature = "os-notifications")]
         if self.should_notify() {
-            if let Err(e) = notification_content.send_os_notification().await {
+            if let Err(e) = notification_content.send_os_notification() {
                 warn!("Unable to send system notification: {}", e);
             }
         }

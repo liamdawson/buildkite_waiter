@@ -1,7 +1,6 @@
 use super::error::RequestError;
 use crate::Buildkite;
 use chrono::{DateTime, Utc};
-use reqwest::Method;
 
 #[derive(serde::Deserialize)]
 pub struct ApiUser {
@@ -13,13 +12,7 @@ pub struct ApiUser {
 }
 
 impl Buildkite {
-    pub async fn get_access_token_holder(&self) -> Result<ApiUser, RequestError> {
-        Ok(self
-            .path_request(Method::GET, "user")?
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?)
+    pub fn get_access_token_holder(&self) -> Result<ApiUser, RequestError> {
+        Ok(self.path_request("GET", "user").call()?.into_json()?)
     }
 }

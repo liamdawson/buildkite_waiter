@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
+- Output web URL once a build is found
 - Simplified internal code structure (to a single crate).
 
 ## [0.2.1] - 2020-08-14

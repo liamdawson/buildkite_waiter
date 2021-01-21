@@ -2,6 +2,9 @@
 pub enum RequestError {
     #[error("this call requires credentials")]
     CredentialsRequired,
+    // TODO: better handling
     #[error(transparent)]
-    ReqwestError(#[from] reqwest::Error),
+    UreqError(#[from] ureq::Error),
+    #[error(transparent)]
+    IoError(#[from] std::io::Error),
 }

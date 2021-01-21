@@ -1,6 +1,10 @@
 mod buildkite;
+mod waiter;
+
+use std::time::Duration;
 
 pub use buildkite::*;
+pub use waiter::*;
 
 use once_cell::sync::Lazy;
 
@@ -10,13 +14,20 @@ pub static PUBLIC_BUILDKITE_API_URL: Lazy<&'static str> =
 
 #[derive(Clone)]
 pub struct Buildkite {
+    agent: ureq::Agent,
     pub api_url: String,
     pub(crate) credentials: Option<BuildkiteCredentials>,
 }
 
 impl Buildkite {
     pub fn new(api_url: &str) -> Self {
+        let agent = ureq::builder()
+            // wait 5s to connect, 10s to read a response
+            .timeout_connect(Duration::from_millis(5_000))
+            .timeout_read(Duration::from_millis(10_000))
+            .build();
         Self {
+            agent,
             api_url: api_url.to_string(),
             credentials: None,
         }

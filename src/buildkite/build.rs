@@ -1,7 +1,6 @@
 use super::error::RequestError;
 use crate::Buildkite;
 use chrono::{DateTime, Utc};
-use reqwest::Method;
 
 pub enum BuildScope {
     All,
@@ -43,38 +42,24 @@ type FindResult = Result<Build, RequestError>;
 type OptionalFindResult = Result<Option<Build>, RequestError>;
 
 impl Buildkite {
-    pub async fn build_by_url(&self, url: &str) -> FindResult {
-        Ok(self
-            .request(Method::GET, url)?
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?)
+    pub fn build_by_url(&self, url: &str) -> FindResult {
+        Ok(self.request("GET", url).call()?.into_json()?)
     }
 
-    pub async fn build_by_number(
-        &self,
-        organization: &str,
-        pipeline: &str,
-        number: &str,
-    ) -> FindResult {
+    pub fn build_by_number(&self, organization: &str, pipeline: &str, number: &str) -> FindResult {
         Ok(self
             .path_request(
-                Method::GET,
+                "GET",
                 &format!(
                     "organizations/{}/pipelines/{}/builds/{}",
                     organization, pipeline, number
                 ),
-            )?
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?)
+            )
+            .call()?
+            .into_json()?)
     }
 
-    pub async fn latest_build(
+    pub fn latest_build(
         &self,
         scope: BuildScope,
         branches: &[&str],
@@ -106,14 +91,13 @@ impl Buildkite {
             query.push(("commit", commit));
         }
 
-        let mut builds: Vec<Build> = self
-            .path_request(Method::GET, &path)?
-            .query(query.as_slice())
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?;
+        let mut req = self.path_request("GET", &path);
+
+        for (key, value) in query {
+            req = req.query(key, value);
+        }
+
+        let mut builds: Vec<Build> = req.call()?.into_json()?;
 
         if !builds.is_empty() {
             Ok(Some(builds.remove(0)))

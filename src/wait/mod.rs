@@ -1,4 +1,5 @@
 mod retry;
+mod waiter;
 
 use anyhow::Context;
 use buildkite_waiter::{Build, Buildkite};
@@ -6,27 +7,7 @@ use std::{future::Future, time::Duration};
 use tokio::time::delay_for;
 use url::Url;
 
-pub async fn by_url(
-    url: &str,
-    runtime_args: crate::cli::RuntimeArgs,
-    output: crate::cli::OutputArgs,
-) -> anyhow::Result<i32> {
-    for_build(
-        |client| async move {
-            let resp = client
-                .build_by_url(url)
-                .await
-                .context("Failed to retrieve build")?;
-
-            Ok(resp)
-        },
-        runtime_args,
-        output,
-    )
-    .await
-}
-
-pub async fn for_build<F, Fut>(
+pub fn for_build<F, Fut>(
     build_fn: F,
     runtime_args: crate::cli::RuntimeArgs,
     output: crate::cli::OutputArgs,
@@ -75,7 +56,7 @@ where
         build = get_result.context("Unable to retrieve build details")?;
     }
 
-    Ok(output.on_completion(&build).await)
+    Ok(output.on_completion(&build))
 }
 
 // TODO: handle rate limiting

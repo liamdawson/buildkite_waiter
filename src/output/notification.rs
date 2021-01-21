@@ -1,5 +1,7 @@
 use buildkite_waiter::Build;
+use heck::TitleCase;
 use serde::Serialize;
+use std::time::Duration;
 
 #[derive(Serialize)]
 pub struct NotificationContent {
@@ -18,8 +20,8 @@ impl From<&Build> for NotificationContent {
 
         Self {
             title: format!(
-                "{:?}: {}/{} {}",
-                build.state, build.pipeline.slug, build.number, build.branch
+                "{}: {}/{} {}",
+                build.state.to_title_case(), build.pipeline.slug, build.number, build.branch
             ),
             message: format!(
                 "Finished {}",
@@ -34,16 +36,16 @@ impl From<&Build> for NotificationContent {
 
 impl NotificationContent {
     #[cfg(feature = "os-notifications")]
-    pub async fn send_os_notification(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let result = notifica::notify(&self.title, &self.message);
+    pub fn send_os_notification(&self) -> Result<(), Box<dyn std::error::Error>> {
+        notifica::notify(&self.title, &self.message)?;
 
         // Clue from https://stackoverflow.com/questions/62753205/threadsleep-is-required-for-my-toast-notification-program-in-rust-winrt
         // suggests some delay is necessary to ensure the notification is displayed on Windows
         // (or maybe some cleanup isn't called before exit?)
         if cfg!(windows) {
-            tokio::time::delay_for(std::time::Duration::from_millis(10)).await;
+            std::thread::sleep(Duration::from_millis(10));
         }
 
-        result
+        Ok(())
     }
 }

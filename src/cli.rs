@@ -80,11 +80,7 @@ pub struct LatestStrategyArgs {
 pub struct RuntimeArgs {
     #[structopt(long, default_value = "3600")]
     /// Maximum time to wait for the build, in seconds
-    pub timeout: u32,
-
-    // TODO: expose or hardcode?
-    #[structopt(skip)]
-    pub request_cooldown: Option<u32>,
+    pub timeout: u64,
 }
 
 #[derive(StructOpt, Debug, PartialEq, Clone)]
@@ -93,8 +89,8 @@ pub struct OutputArgs {
     #[structopt(long, hidden(true))]
     pub notification: bool,
 
-    // keep for compatibility (but don't show in help output)
     // if notification support wasn't compiled
+    // keep for compatibility (but don't show in help output)
     #[cfg(not(feature = "os-notifications"))]
     #[structopt(long, hidden(true))]
     pub no_notification: bool,

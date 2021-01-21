@@ -1,11 +1,9 @@
 [package]
 name = "buildkite_waiter"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Liam Dawson <liam@ldaws.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
-# I don't think this can be published if buildkite_rust isn't
-publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -16,28 +14,27 @@ os-notifications = ["notifica"]
 [dependencies]
 
 # feature os-notifications
-notifica = { version = "2.0.0", optional = true }
+notifica = { version = "3.0.1", optional = true }
 
-anyhow = "1.0.32"
-chrono = { version = "0.4.15", features = ["serde"] }
-chrono-humanize = "0.0.11"
+anyhow = "1.0.38"
+chrono = { version = "0.4.19", features = ["serde"] }
+chrono-humanize = "0.1.1"
 clap = "2.33.3"
-console = "0.12.0"
-dialoguer = "0.6.2"
+console = "0.14.0"
+dialoguer = "0.7.1"
 fern = "0.6.0"
-heck = "0.3.1"
-keyring = "0.9.0"
-log = "0.4.11"
-once_cell = "1.4.1"
-reqwest = { version = "0.10.8", features = ["json"] }
+heck = "0.3.2"
+keyring = "0.10.1"
+log = "0.4.13"
+once_cell = "1.5.2"
 secrecy = "0.7.0"
-serde = { version = "1.0.115", features = ["derive"] }
-serde_json = "1.0.57"
-structopt = "0.3.17"
-thiserror = "1.0.20"
-tokio = { version = "0.2.22", features = ["full"] }
-url = "2.1.1"
+serde = { version = "1.0.120", features = ["derive"] }
+serde_json = "1.0.61"
+structopt = "0.3.21"
+thiserror = "1.0.23"
+url = "2.2.0"
+ureq = { version = "2.0.1", features = ["json"] }
 
 [build-dependencies]
-structopt = "0.3.17"
-url = "2.1.1"
+structopt = "0.3.21"
+url = "2.2.0"
