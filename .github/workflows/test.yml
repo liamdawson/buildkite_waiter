@@ -28,6 +28,16 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+  build-macos-arm:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install aarch64-apple-darwin target
+      run: rustup target add aarch64-apple-darwin
+    - name: Build
+      run: cargo build --verbose --target=aarch64-apple-darwin
+    - name: Run tests
+      run: cargo test --verbose
   build-windows:
     runs-on: windows-latest
     steps:

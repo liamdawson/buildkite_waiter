@@ -137,7 +137,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "buildkite_waiter"
-version = "0.3.0"
+version = "0.3.0-beta.1"
 dependencies = [
  "anyhow",
  "chrono",
