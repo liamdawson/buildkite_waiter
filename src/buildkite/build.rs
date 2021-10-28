@@ -83,7 +83,7 @@ impl Buildkite {
         states: &[&str],
     ) -> OptionalFindResult {
         let path = match scope {
-            BuildScope::All => format!("{}", "builds"),
+            BuildScope::All => "builds".to_string(),
             BuildScope::Organization(organization) => {
                 format!("organizations/{}/builds", &organization)
             }
@@ -95,8 +95,8 @@ impl Buildkite {
 
         let mut query = Vec::new();
 
-        query.extend(branches.into_iter().map(|&branch| ("branch[]", branch)));
-        query.extend(states.into_iter().map(|&state| ("state[]", state)));
+        query.extend(branches.iter().map(|&branch| ("branch[]", branch)));
+        query.extend(states.iter().map(|&state| ("state[]", state)));
 
         if let Some(creator) = creator {
             query.push(("creator", creator));
