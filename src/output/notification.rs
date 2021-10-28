@@ -24,7 +24,7 @@ impl From<&Build> for NotificationContent {
             message: format!(
                 "Finished {}",
                 human.to_text_en(
-                    chrono_humanize::Accuracy::Precise,
+                    chrono_humanize::Accuracy::Rough,
                     chrono_humanize::Tense::Past
                 )
             ),
@@ -34,14 +34,14 @@ impl From<&Build> for NotificationContent {
 
 impl NotificationContent {
     #[cfg(feature = "os-notifications")]
-    pub async fn send_os_notification(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn send_os_notification(&self) -> Result<(), notifica::Error> {
         let result = notifica::notify(&self.title, &self.message);
 
         // Clue from https://stackoverflow.com/questions/62753205/threadsleep-is-required-for-my-toast-notification-program-in-rust-winrt
         // suggests some delay is necessary to ensure the notification is displayed on Windows
         // (or maybe some cleanup isn't called before exit?)
         if cfg!(windows) {
-            tokio::time::delay_for(std::time::Duration::from_millis(10)).await;
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
 
         result

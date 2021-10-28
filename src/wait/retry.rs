@@ -1,6 +1,6 @@
 use buildkite_waiter::{Build, Buildkite};
 use std::time::Duration;
-use tokio::time::delay_for;
+use tokio::time::sleep;
 use url::Url;
 
 pub async fn attempt_build_by_url(
@@ -23,7 +23,7 @@ pub async fn attempt_build_by_url(
 
         debug!("Retrying after {}s", delay);
 
-        delay_for(Duration::from_secs(delay)).await;
+        sleep(Duration::from_secs(delay)).await;
 
         last_result = client.build_by_url(url.as_str()).await;
     }

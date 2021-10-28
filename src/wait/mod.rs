@@ -3,7 +3,7 @@ mod retry;
 use anyhow::Context;
 use buildkite_waiter::{Build, Buildkite};
 use std::{future::Future, time::Duration};
-use tokio::time::delay_for;
+use tokio::time::sleep;
 use url::Url;
 
 pub async fn by_url(
@@ -52,27 +52,28 @@ where
         "Waiting a maximum of {:?} for build completion",
         timeout_duration
     );
-    let mut timeout = delay_for(timeout_duration);
 
     while !build.is_finished() {
         let poll_pause = Duration::from_secs(30);
 
         debug!("Waiting {:?}s to poll build", poll_pause);
 
-        delay_for(poll_pause).await;
+        sleep(poll_pause).await;
 
         info!("Checking build status");
 
         let build_url = Url::parse(&build.url)?;
 
-        let get_result = tokio::select! {
-            _ = &mut timeout => {
-                anyhow::bail!("Timed out waiting for build.");
-            },
-            get_result = retry::attempt_build_by_url(&client, &build_url, 3) => get_result,
-        };
-
-        build = get_result.context("Unable to retrieve build details")?;
+        if let Ok(get_result) = tokio::time::timeout(
+            timeout_duration,
+            retry::attempt_build_by_url(&client, &build_url, 3),
+        )
+        .await
+        {
+            build = get_result.context("Unable to retrieve build details")?;
+        } else {
+            anyhow::bail!("Timed out waiting for build details");
+        }
     }
 
     Ok(output.on_completion(&build).await)
