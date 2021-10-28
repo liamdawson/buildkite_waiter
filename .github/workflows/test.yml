@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: '*'
   pull_request:
     branches: [ main ]
 
@@ -10,37 +10,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test-ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install Ubuntu dependencies
-      run: sudo apt-get install -y libdbus-1-dev
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-  test-macos-intel:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
   build-macos-arm:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - name: List SDKs
+      run: xcodebuild -showsdks
     - name: Install target toolchain
       run: rustup target add aarch64-apple-darwin
     - name: Build
       run: cargo build --verbose --target=aarch64-apple-darwin
-  test-windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
