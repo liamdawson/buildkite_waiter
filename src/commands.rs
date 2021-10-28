@@ -13,7 +13,6 @@ pub fn login() -> anyhow::Result<i32> {
 
     auth::keyring_entry()
         .set_password(&access_token)
-        .map_err(auth::serialize_error)
         .context("Failed to save API token")?;
 
     println!("{}", console::style("OK").green());
@@ -24,7 +23,6 @@ pub fn login() -> anyhow::Result<i32> {
 pub fn logout() -> anyhow::Result<i32> {
     auth::keyring_entry()
         .delete_password()
-        .map_err(auth::serialize_error)
         .context("Failed to delete saved API token")?;
 
     println!("{}", console::style("OK").green());
