@@ -30,12 +30,19 @@ jobs:
       run: cargo test --verbose
   build-macos-arm:
     runs-on: macos-latest
+    env:
+      WORKFLOW_TARGET_MACOS_SDK: macosx11.1
     steps:
     - uses: actions/checkout@v2
+    - name: List SDKs
+      run: xcodebuild -showsdks
     - name: Install target toolchain
       run: rustup target add aarch64-apple-darwin
     - name: Build
-      run: cargo build --verbose --target=aarch64-apple-darwin
+      run: |
+        SDKROOT="$(xcrun -sdk ${{ env.WORKFLOW_TARGET_MACOS_SDK }} --show-sdk-path)" \
+        MACOSX_DEPLOYMENT_TARGET="$(xcrun -sdk ${{ env.WORKFLOW_TARGET_MACOS_SDK }} --show-sdk-platform-version)" \
+        cargo build --verbose --target=aarch64-apple-darwin
   test-windows:
     runs-on: windows-latest
     steps:
