@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-ubuntu:
+  test-ubuntu:
     runs-on: ubuntu-latest
     steps:
     - name: Install Ubuntu dependencies
@@ -20,7 +20,7 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-  build-macos:
+  test-macos-intel:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -28,7 +28,15 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-  build-windows:
+  build-macos-arm:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install target toolchain
+      run: rustup target add aarch64-apple-darwin
+    - name: Build
+      run: cargo build --verbose --target=aarch64-apple-darwin
+  test-windows:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
