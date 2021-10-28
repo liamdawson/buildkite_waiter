@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate log;
 
-use anyhow::Context;
 use cli::Command;
 use structopt::StructOpt;
 
@@ -24,95 +23,17 @@ async fn main() -> anyhow::Result<()> {
             output,
             runtime,
             strategy,
-        } => {
-            let client = app::auth::client()?;
-
-            let build = client
-                .build_by_number(
-                    &strategy.organization,
-                    &strategy.pipeline,
-                    &format!("{}", strategy.number),
-                )
-                .await?;
-
-            wait::by_url(&build.url, runtime, output).await
-        }
+        } => app::wait_by::number(output, runtime, strategy).await,
         Command::ByUrl {
             output,
             runtime,
             strategy,
-        } => {
-            let client = app::auth::client()?;
-
-            let (organization, pipeline, number) =
-                buildkite_waiter::url::build_number(strategy.url.as_str())?;
-
-            let build = client
-                .build_by_number(&organization, &pipeline, &number)
-                .await?;
-
-            wait::by_url(&build.url, runtime, output).await
-        }
+        } => app::wait_by::url(output, runtime, strategy).await,
         Command::Latest {
             output,
             runtime,
             strategy,
-        } => {
-            let client = app::auth::client()?;
-
-            let scope = if let Some(organization) = strategy.organization {
-                if let Some(pipeline) = strategy.pipeline {
-                    buildkite_waiter::BuildScope::Pipeline(organization, pipeline)
-                } else {
-                    buildkite_waiter::BuildScope::Organization(organization)
-                }
-            } else {
-                buildkite_waiter::BuildScope::All
-            };
-
-            let creator = if let Some(creator) = strategy.creator {
-                Some(creator)
-            } else if strategy.mine {
-                let id = client.get_access_token_holder()
-                    .await
-                    .context("Unable to determine the current user (the API Access Token may need the \"Read User\" permission)")?
-                    .id;
-
-                Some(id)
-            } else {
-                None
-            };
-
-            let build = client
-                .latest_build(
-                    scope,
-                    strategy
-                        .branch
-                        .iter()
-                        .map(|x| &**x)
-                        .collect::<Vec<_>>()
-                        .as_slice(),
-                    creator.iter().map(|x| &**x).collect::<Vec<_>>().pop(),
-                    strategy
-                        .commit
-                        .iter()
-                        .map(|x| &**x)
-                        .collect::<Vec<_>>()
-                        .pop(),
-                    strategy
-                        .state
-                        .iter()
-                        .map(|x| &**x)
-                        .collect::<Vec<_>>()
-                        .as_slice(),
-                )
-                .await?;
-            if let Some(build) = build {
-                wait::by_url(&build.url, runtime, output).await
-            } else {
-                Err(anyhow::anyhow!("No matching builds were found"))
-            }
-        }
+        } => app::wait_by::latest(output, runtime, strategy).await,
         Command::Login => commands::login(),
         Command::Logout => commands::logout(),
     }?;
