@@ -24,23 +24,30 @@ impl crate::cli::OutputArgs {
             }
         }
         line = format!(
-            "{} {}",
+            "{} {} {}",
             line,
-            format!(
-                "{} {}",
-                style("on branch").dim(),
-                style(&build.branch).cyan()
-            )
+            style("on branch").dim(),
+            style(&build.branch).cyan()
         );
 
         // use writeln! and .ok(), because it's fine if the output couldn't be written
         writeln!(std::io::stderr(), "{}", line).ok();
+        writeln!(
+            std::io::stderr(),
+            "{}",
+            style(&build.web_url).underlined().dim()
+        )
+        .ok();
 
         if let Some(message) = &build.message {
+            writeln!(std::io::stderr()).ok();
+
             if let Some(first_line) = message.lines().next() {
                 writeln!(std::io::stderr(), "  {}", first_line).ok();
             }
         }
+
+        writeln!(std::io::stderr()).ok();
     }
 
     pub async fn on_completion(&self, build: &Build) -> i32 {
