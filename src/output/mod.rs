@@ -4,7 +4,7 @@ pub use notification::NotificationContent;
 
 use buildkite_waiter::Build;
 use console::style;
-use heck::TitleCase;
+use heck::ToTitleCase;
 use std::io::Write;
 
 impl crate::cli::OutputArgs {

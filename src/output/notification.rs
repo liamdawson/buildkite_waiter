@@ -1,4 +1,5 @@
 use buildkite_waiter::Build;
+use heck::ToTitleCase;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -18,8 +19,11 @@ impl From<&Build> for NotificationContent {
 
         Self {
             title: format!(
-                "{:?}: {}/{} {}",
-                build.state, build.pipeline.slug, build.number, build.branch
+                "{}: {}/{} {}",
+                build.state.to_title_case(),
+                build.pipeline.slug,
+                build.number,
+                build.branch
             ),
             message: format!(
                 "Finished {}",
