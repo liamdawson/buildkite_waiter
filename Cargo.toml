@@ -68,3 +68,6 @@ include = [
   "target/release/buildkite_waiter.fish",
   "target/release/buildkite_waiter.ts",
 ]
+
+[workspace.metadata.dist.dependencies.apt]
+libdbus-1-dev = "*"
