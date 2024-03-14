@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Output URL in message when a build is found
 - Fig completions
+- Allow most options to be configured by environment variables
 
 ### Notes
 

@@ -14,7 +14,7 @@ const ALLOWED_BUILD_STATE_VALUES: &[&str] = &[
     "canceling",
     "skipped",
     "not_run",
-    "finished"
+    "finished",
 ];
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -25,7 +25,7 @@ pub enum OutputType {
     /// Build state and browser URL
     StateUrl,
     /// No output
-    None
+    None,
 }
 
 #[derive(Debug, Parser, PartialEq, Clone)] // requires `derive` feature
@@ -73,13 +73,13 @@ pub enum Commands {
 
 #[derive(Args, Debug, PartialEq, Clone)]
 pub struct ByNumberStrategyArgs {
-    #[arg(value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_ORGANIZATION")]
     /// Organization slug
     pub organization: String,
-    #[arg(value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_PIPELINE")]
     /// Pipeline slug
     pub pipeline: String,
-    #[arg(value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_BUILD_NUMBER")]
     /// Build number
     pub number: u32,
 }
@@ -92,28 +92,28 @@ pub struct ByUrlStrategyArgs {
 
 #[derive(Args, Debug, PartialEq, Clone)]
 pub struct LatestStrategyArgs {
-    #[arg(long, value_hint = ValueHint::Other)]
+    #[arg(long, value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_ORGANIZATION")]
     pub organization: Option<String>,
-    #[arg(long, requires("organization"), value_hint = ValueHint::Other)]
+    #[arg(long, requires("organization"), value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_PIPELINE")]
     pub pipeline: Option<String>,
-    #[arg(long, value_hint = ValueHint::Other)]
+    #[arg(long, value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_BRANCH")]
     pub branch: Vec<String>,
     #[arg(long)]
     /// Find build by owner of the API Access Token (requires the "Read User" permission on the token)
     pub mine: bool,
-    #[arg(long, conflicts_with("mine"), value_hint = ValueHint::Other)]
+    #[arg(long, conflicts_with("mine"), value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_CREATOR")]
     /// Find build by creator ID
     pub creator: Option<String>,
-    #[arg(long, value_hint = ValueHint::Other)]
+    #[arg(long, value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_COMMIT")]
     /// Find build by (long) commit hash
     pub commit: Option<String>,
-    #[arg(long, value_parser = PossibleValuesParser::new(ALLOWED_BUILD_STATE_VALUES))]
+    #[arg(long, value_parser = PossibleValuesParser::new(ALLOWED_BUILD_STATE_VALUES), env = "BUILDKITE_WAITER_STATE")]
     pub state: Vec<String>,
 }
 
 #[derive(Args, Debug, PartialEq, Clone)]
 pub struct RuntimeArgs {
-    #[arg(long, default_value = "3600", value_hint = ValueHint::Other)]
+    #[arg(long, default_value = "3600", value_hint = ValueHint::Other, env = "BUILDKITE_WAITER_TIMEOUT")]
     /// Maximum time to wait for the build, in seconds
     pub timeout: u32,
 
@@ -132,6 +132,6 @@ pub struct OutputArgs {
     /// Never send a system notification
     pub no_notification: bool,
 
-    #[arg(long, value_enum, default_value_t = OutputType::StateUrl)]
+    #[arg(long, value_enum, default_value_t = OutputType::StateUrl, env = "BUILDKITE_WAITER_OUTPUT")]
     pub output: OutputType,
 }
