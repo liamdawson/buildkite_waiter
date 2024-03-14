@@ -4,6 +4,7 @@ version = "0.3.0"
 authors = ["Liam Dawson <liam@ldaws.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/liamdawson/buildkite_waiter"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -40,3 +41,30 @@ clap = { version = "4.5.2", features = ["derive", "cargo"] }
 clap_complete = "4.5.1"
 clap_complete_fig = "4.5.0"
 url = "2.1.1"
+
+# The profile that 'cargo dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+# Config for 'cargo dist'
+[workspace.metadata.dist]
+# The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.11.1"
+# CI backends to support
+ci = ["github"]
+# The installers to generate for each app
+installers = ["shell"]
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+# Publish jobs to run in CI
+pr-run-mode = "plan"
+
+include = [
+  "target/release/_buildkite_waiter",
+  "target/release/_buildkite_waiter.ps1",
+  "target/release/buildkite_waiter.bash",
+  "target/release/buildkite_waiter.elv",
+  "target/release/buildkite_waiter.fish",
+  "target/release/buildkite_waiter.ts",
+]
