@@ -2,11 +2,11 @@ mod buildkite;
 
 pub use buildkite::*;
 
-use once_cell::sync::Lazy;
-
 // allow compile-time overrides
-pub static PUBLIC_BUILDKITE_API_URL: Lazy<&'static str> =
-    Lazy::new(|| option_env!("BUILDKITE_WAITER_API_URL").unwrap_or("https://api.buildkite.com/v2"));
+pub const PUBLIC_BUILDKITE_API_URL: &str = match option_env!("BUILDKITE_WAITER_API_URL") {
+    Some(override_url) => override_url,
+    None => "https://api.buildkite.com/v2",
+};
 
 #[derive(Clone)]
 pub struct Buildkite {
@@ -31,6 +31,6 @@ impl Buildkite {
 
 impl Default for Buildkite {
     fn default() -> Self {
-        Self::new(*PUBLIC_BUILDKITE_API_URL)
+        Self::new(PUBLIC_BUILDKITE_API_URL)
     }
 }

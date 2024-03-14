@@ -11,7 +11,7 @@ pub fn login() -> anyhow::Result<i32> {
         .with_prompt("Buildkite API Access Token")
         .interact()?;
 
-    auth::keyring_entry()
+    auth::keyring_entry()?
         .set_password(&access_token)
         .context("Failed to save API token")?;
 
@@ -21,7 +21,7 @@ pub fn login() -> anyhow::Result<i32> {
 }
 
 pub fn logout() -> anyhow::Result<i32> {
-    auth::keyring_entry()
+    auth::keyring_entry()?
         .delete_password()
         .context("Failed to delete saved API token")?;
 
