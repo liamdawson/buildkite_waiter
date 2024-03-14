@@ -10,6 +10,12 @@ A command-line tool which waits for Buildkite builds to complete, and then notif
 brew install liamdawson/repo/buildkite_waiter
 ```
 
+### Shell
+
+```shell
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/liamdawson/buildkite_waiter/releases/latest/download/buildkite_waiter-installer.sh | sh
+```
+
 ### Manual
 
 Download the binary from the [latest release](https://github.com/liamdawson/buildkite_waiter/releases/latest), and place it somewhere on `$PATH`.
@@ -37,6 +43,10 @@ $ buildkite_waiter by-number my-great-org my-pipeline 1
 
 # wait for latest, but don't send an OS notification
 $ buildkite_waiter latest --no-notification
+
+# organization can be set by environment variables (among other options)
+$ export BUILDKITE_WAITER_ORGANIZATION=my-great-org
+$ buildkite_waiter latest --pipeline my-pipeline
 ```
 
 ## API Access Token
