@@ -73,13 +73,13 @@ pub enum Commands {
 
 #[derive(Args, Debug, PartialEq, Clone)]
 pub struct ByNumberStrategyArgs {
-    #[arg(index = 0, value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other)]
     /// Organization slug
     pub organization: String,
-    #[arg(index = 1, value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other)]
     /// Pipeline slug
     pub pipeline: String,
-    #[arg(index = 2, value_hint = ValueHint::Other)]
+    #[arg(value_hint = ValueHint::Other)]
     /// Build number
     pub number: u32,
 }
