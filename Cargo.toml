@@ -61,12 +61,12 @@ targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-
 pr-run-mode = "plan"
 
 include = [
-  "target/release/_buildkite_waiter",
-  "target/release/_buildkite_waiter.ps1",
-  "target/release/buildkite_waiter.bash",
-  "target/release/buildkite_waiter.elv",
-  "target/release/buildkite_waiter.fish",
-  "target/release/buildkite_waiter.ts",
+  "completions/_buildkite_waiter",
+  "completions/_buildkite_waiter.ps1",
+  "completions/buildkite_waiter.bash",
+  "completions/buildkite_waiter.elv",
+  "completions/buildkite_waiter.fish",
+  "completions/buildkite_waiter.ts",
 ]
 
 [workspace.metadata.dist.dependencies.apt]

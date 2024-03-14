@@ -5,33 +5,25 @@ use clap::CommandFactory;
 use clap_complete::Shell;
 use cli::Cli;
 use std::ffi::OsStr;
-use std::fs::File;
 use std::{env, path::PathBuf};
 
 fn main() {
-    let target_dir = match env::var_os("OUT_DIR") {
-        // if no OUT_DIR, no need to write man/completions
-        None => return,
-        Some(outdir) => PathBuf::from(outdir),
-    };
-
-    let mut completion_dirs = vec![target_dir.clone()];
-
-    if Ok("release".to_string()) == env::var("PROFILE") {
-        if let Some(manifest_dir) = env::var_os("CARGO_MANIFEST_DIR") {
-            completion_dirs.push(PathBuf::from(manifest_dir).join("target").join("release"));
-        }
-    };
-
-    dbg!(&completion_dirs);
-
-    for target_dir in completion_dirs {
-        generate_completions(target_dir.as_os_str());
+    if env::var("PROFILE") != Ok("release".to_string()) {
+        // only generate completions on release builds
+        return;
     }
 
-    let anchor = PathBuf::from(&target_dir).join("buildkite_waiter-stamp");
+    let target_dir = match env::var_os("CARGO_MANIFEST_DIR") {
+        // if no CARGO_MANIFEST_DIR, don't completions
+        None => return,
+        Some(outdir) => PathBuf::from(outdir).join("completions"),
+    };
 
-    File::create(anchor).unwrap();
+    if !target_dir.exists() {
+        std::fs::create_dir_all(&target_dir).expect("should find or create completions directory");
+    }
+
+    generate_completions(target_dir.as_os_str());
 }
 
 fn generate_completions(target_dir: &OsStr) {
@@ -46,13 +38,19 @@ fn generate_completions(target_dir: &OsStr) {
         Shell::Zsh,
     ] {
         if let Err(err) = clap_complete::generate_to(*shell, &mut cmd, bin_name, target_dir) {
-            panic!("failed to generate completions for {:?} in {:?}: {:?}", shell, target_dir, err);
+            panic!(
+                "failed to generate completions for {:?} in {:?}: {:?}",
+                shell, target_dir, err
+            );
         }
     }
 
     if let Err(err) =
         clap_complete::generate_to(clap_complete_fig::Fig, &mut cmd, bin_name, target_dir)
     {
-        panic!("failed to generate completions for fig in {:?}: {:?}", target_dir, err);
+        panic!(
+            "failed to generate completions for fig in {:?}: {:?}",
+            target_dir, err
+        );
     }
 }
