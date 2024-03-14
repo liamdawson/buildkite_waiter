@@ -3,6 +3,9 @@ use crate::Buildkite;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 
+// Corresponds to the `finished` state for the Buildkite API:
+const FINISHED_BUILD_STATES: &[&str] = &["passed", "failed", "blocked", "canceled"];
+
 pub enum BuildScope {
     All,
     Organization(String),
@@ -35,7 +38,7 @@ pub struct BuildCreator {
 impl Build {
     pub fn is_finished(&self) -> bool {
         // Corresponds to the `finished` state for the Buildkite API:
-        super::build_states::FINISHED_BUILD_STATES.contains(&self.state.as_str())
+        FINISHED_BUILD_STATES.contains(&self.state.as_str())
     }
 }
 

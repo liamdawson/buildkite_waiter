@@ -7,10 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Added
 
-- Fix regression with notification message state title
 - Output URL in message when a build is found
+- Fig completions
 
 ### Notes
 

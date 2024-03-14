@@ -7,6 +7,8 @@ use console::style;
 use heck::ToTitleCase;
 use std::io::Write;
 
+use crate::cli::OutputType;
+
 impl crate::cli::OutputArgs {
     pub fn should_notify(&self) -> bool {
         !self.no_notification
@@ -53,19 +55,15 @@ impl crate::cli::OutputArgs {
     pub async fn on_completion(&self, build: &Build) -> i32 {
         let notification_content: NotificationContent = build.into();
 
-        match self.output.as_str() {
-            "none" => {}
-            "state-url" => {
+        match self.output {
+            OutputType::None => {}
+            OutputType::StateUrl => {
                 writeln!(std::io::stderr()).ok();
                 println!("{} {}", style_state(&build.state), build.web_url);
             }
-            "notification-lines" => {
+            OutputType::NotificationLines => {
                 println!("{}", notification_content.title);
                 println!("{}", notification_content.message);
-            }
-            _ => {
-                // should only occur if a new possible_value is added to cli.rs
-                unreachable!("Output format has not been defined")
             }
         }
 

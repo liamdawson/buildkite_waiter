@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate log;
 
-use cli::Command;
-use structopt::StructOpt;
+use clap::{crate_name, Parser};
+use cli::{Cli, Commands};
 
 mod app;
 mod cli;
@@ -10,9 +10,9 @@ mod commands;
 mod output;
 mod wait;
 
-pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
+pub const APP_NAME: &str = crate_name!();
 pub const DEVELOPER_IDENTIFIER: &str = "com.ldaws";
-pub const APP_ID: &str = concat!("com.ldaws.", env!("CARGO_PKG_NAME"));
+pub const APP_ID: &str = concat!("com.ldaws.", crate_name!());
 
 fn main() -> anyhow::Result<()> {
     configure_logger()?;
@@ -27,24 +27,26 @@ fn main() -> anyhow::Result<()> {
 }
 
 async fn inner_main() -> anyhow::Result<i32> {
-    match Command::from_args() {
-        Command::ByNumber {
+    let args = Cli::parse();
+
+    match args.command {
+        Commands::ByNumber {
             output,
             runtime,
             strategy,
         } => app::wait_by::number(output, runtime, strategy).await,
-        Command::ByUrl {
+        Commands::ByUrl {
             output,
             runtime,
             strategy,
         } => app::wait_by::url(output, runtime, strategy).await,
-        Command::Latest {
+        Commands::Latest {
             output,
             runtime,
             strategy,
         } => app::wait_by::latest(output, runtime, strategy).await,
-        Command::Login => commands::login(),
-        Command::Logout => commands::logout(),
+        Commands::Login => commands::login(),
+        Commands::Logout => commands::logout(),
     }
 }
 

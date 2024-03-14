@@ -1,17 +1,12 @@
-extern crate structopt;
+#[path = "src/cli.rs"]
+mod cli;
 
+use clap::CommandFactory;
+use clap_complete::Shell;
+use cli::Cli;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::{env, path::PathBuf};
-use structopt::clap::Shell;
-
-include!("src/cli.rs");
-
-pub mod buildkite_waiter {
-    pub mod build_states {
-        include!("src/buildkite/build_states.rs");
-    }
-}
 
 fn main() {
     let target_dir = match env::var_os("OUT_DIR") {
@@ -38,7 +33,24 @@ fn main() {
 }
 
 fn generate_completions(target_dir: &OsStr) {
-    for shell in &[Shell::Bash, Shell::Fish, Shell::Zsh, Shell::PowerShell] {
-        Command::clap().gen_completions(env!("CARGO_PKG_NAME"), *shell, target_dir);
+    let bin_name = env!("CARGO_PKG_NAME");
+    let mut cmd = Cli::command();
+
+    for shell in &[
+        Shell::Bash,
+        Shell::Elvish,
+        Shell::Fish,
+        Shell::PowerShell,
+        Shell::Zsh,
+    ] {
+        if let Err(err) = clap_complete::generate_to(*shell, &mut cmd, bin_name, target_dir) {
+            panic!("failed to generate completions for {:?}: {:?}", shell, err);
+        }
+    }
+
+    if let Err(err) =
+        clap_complete::generate_to(clap_complete_fig::Fig, &mut cmd, bin_name, target_dir)
+    {
+        panic!("failed to generate completions for fig: {:?}", err);
     }
 }
