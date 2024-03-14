@@ -132,6 +132,6 @@ pub struct OutputArgs {
     /// Never send a system notification
     pub no_notification: bool,
 
-    #[arg(long, value_enum)]
+    #[arg(long, value_enum, default_value_t = OutputType::StateUrl)]
     pub output: OutputType,
 }
