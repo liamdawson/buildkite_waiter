@@ -23,6 +23,8 @@ fn main() {
         }
     };
 
+    dbg!(&completion_dirs);
+
     for target_dir in completion_dirs {
         generate_completions(target_dir.as_os_str());
     }
@@ -44,13 +46,13 @@ fn generate_completions(target_dir: &OsStr) {
         Shell::Zsh,
     ] {
         if let Err(err) = clap_complete::generate_to(*shell, &mut cmd, bin_name, target_dir) {
-            panic!("failed to generate completions for {:?}: {:?}", shell, err);
+            panic!("failed to generate completions for {:?} in {:?}: {:?}", shell, target_dir, err);
         }
     }
 
     if let Err(err) =
         clap_complete::generate_to(clap_complete_fig::Fig, &mut cmd, bin_name, target_dir)
     {
-        panic!("failed to generate completions for fig: {:?}", err);
+        panic!("failed to generate completions for fig in {:?}: {:?}", target_dir, err);
     }
 }
