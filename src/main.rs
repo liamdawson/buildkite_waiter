@@ -7,7 +7,7 @@ use cli::{Cli, Commands};
 mod app;
 mod cli;
 mod commands;
-mod output;
+pub(crate) mod output;
 mod wait;
 
 pub const APP_NAME: &str = crate_name!();

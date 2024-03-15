@@ -1,10 +1,11 @@
 mod notification;
+mod state;
 
 pub use notification::NotificationContent;
+pub(crate) use state::*;
 
 use buildkite_waiter::Build;
 use console::style;
-use heck::ToTitleCase;
 use std::io::Write;
 
 use crate::cli::OutputType;
@@ -59,7 +60,13 @@ impl crate::cli::OutputArgs {
             OutputType::None => {}
             OutputType::StateUrl => {
                 writeln!(std::io::stderr()).ok();
-                println!("{} {}", style_state(&build.state), build.web_url);
+                println!(
+                    "{} {}",
+                    build
+                        .colored_state_case(state::FormatBuildStateCase::Title)
+                        .bold(),
+                    build.web_url
+                );
             }
             OutputType::NotificationLines => {
                 println!("{}", notification_content.title);
@@ -79,17 +86,4 @@ impl crate::cli::OutputArgs {
             _ => 2,
         }
     }
-}
-
-fn style_state(state: &str) -> String {
-    let state_str = state.to_title_case();
-
-    let colored = match state {
-        "passed" => style(state_str).green(),
-        "blocked" => style(state_str).yellow(),
-        "failed" | "canceled" => style(state_str).red(),
-        _ => style(state_str).magenta(),
-    };
-
-    format!("{}", colored.bold())
 }

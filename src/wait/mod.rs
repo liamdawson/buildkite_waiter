@@ -1,5 +1,6 @@
 mod retry;
 
+use crate::output::{FormatBuildState, FormatBuildStateCase};
 use anyhow::Context;
 use buildkite_waiter::{Build, Buildkite};
 use heck::ToTitleCase;
@@ -109,8 +110,10 @@ where
             anyhow::bail!("Timed out waiting for build details");
         }
     }
-
-    check_spinner.finish_and_clear();
+    check_spinner.finish_with_message(format!(
+        "Build {}",
+        build.colored_state_case(FormatBuildStateCase::Lower),
+    ));
 
     Ok(output.on_completion(&build).await)
 }

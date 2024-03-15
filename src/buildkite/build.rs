@@ -12,6 +12,14 @@ pub enum BuildScope {
     Pipeline(String, String),
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum BuildStateGroup {
+    Successful,
+    Blocked,
+    Unsuccessful,
+    Unfinished,
+}
+
 #[derive(serde::Deserialize)]
 pub struct Build {
     pub number: u64,
@@ -39,6 +47,15 @@ impl Build {
     pub fn is_finished(&self) -> bool {
         // Corresponds to the `finished` state for the Buildkite API:
         FINISHED_BUILD_STATES.contains(&self.state.as_str())
+    }
+
+    pub fn state_group(&self) -> BuildStateGroup {
+        match self.state.as_str() {
+            "passed" => BuildStateGroup::Successful,
+            "blocked" => BuildStateGroup::Blocked,
+            "failed" | "canceled" => BuildStateGroup::Unsuccessful,
+            _ => BuildStateGroup::Unfinished,
+        }
     }
 }
 
